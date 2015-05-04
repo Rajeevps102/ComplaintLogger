@@ -2,9 +2,12 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -25,7 +28,34 @@ public class Splash_screen extends Activity {
         sp=getSharedPreferences("isonetime", Context.MODE_PRIVATE);
         editor = sp.edit();
         chk=sp.getBoolean("isonetime", true);
+
+        //*** Thread for creating the delay for splash screen***//
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                if(chk){
+
+                    //	editor.putBoolean("isonetime",false);
+                    //	editor.commit();
+                    Log.d("tag", "boolean" + chk);
+
+                    Login l=new Login(sp,editor);
+                    Intent i=new Intent(Splash_screen.this,Login.class);
+                    startActivity(i);
+                    finish();
+                }
+                else{
+
+                    Intent j=new Intent(Splash_screen.this,Home.class);
+                    startActivity(j);
+                    finish();
+                }
+            }
+        }, SPLASH_TIME_OUT);
     }
+
 
 
     @Override
