@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 public class Splash_screen extends Activity {
@@ -23,60 +26,56 @@ public class Splash_screen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+        boolean connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            connected = true;
 
-    //*** for initializing the chk value to true for first run ***//
-        sp=getSharedPreferences("isonetime", Context.MODE_PRIVATE);
-        editor = sp.edit();
-        chk=sp.getBoolean("isonetime", true);
+            //*** for initializing the chk value to true for first run ***//
+            sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
+            editor = sp.edit();
+            chk = sp.getBoolean("isonetime", true);
 
-        //*** Thread for creating the delay for splash screen***//
+            //*** Thread for creating the delay for splash screen***//
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                if(chk){
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                    if (chk) {
 
-                    //	editor.putBoolean("isonetime",false);
-                    //	editor.commit();
-                    Log.d("tag", "boolean" + chk);
+                        //	editor.putBoolean("isonetime",false);
+                        //	editor.commit();
+                        Log.d("tag", "boolean" + chk);
 
-                    Login l=new Login(sp,editor);
-                    Intent i=new Intent(Splash_screen.this,Login.class);
-                    startActivity(i);
-                    finish();
+                        Login l = new Login(sp, editor);
+                        Intent i = new Intent(Splash_screen.this, Login.class);
+                        startActivity(i);
+                        finish();
+                    } else {
+
+                        Intent j = new Intent(Splash_screen.this, Home.class);
+                        startActivity(j);
+                        finish();
+                    }
                 }
-                else{
+            }, SPLASH_TIME_OUT);
 
-                    Intent j=new Intent(Splash_screen.this,Home.class);
-                    startActivity(j);
-                    finish();
+        } else {
+            Toast.makeText(getApplicationContext(), "network not available", Toast.LENGTH_LONG).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+
+                    System.exit(0);
                 }
-            }
-        }, SPLASH_TIME_OUT);
-    }
-
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_splash_screen, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+            }, SPLASH_TIME_OUT);
         }
 
-        return super.onOptionsItemSelected(item);
+
     }
+
 }
