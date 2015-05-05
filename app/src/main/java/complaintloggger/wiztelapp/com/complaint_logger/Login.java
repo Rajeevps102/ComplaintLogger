@@ -3,26 +3,47 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 /**
  * Created by Raju on 04-05-2015.
  */
-public class Login extends Activity {
+public class Login extends Activity implements View.OnClickListener {
 
+    /* id's for edittext and button
+       edittext username
+       edittext mail
+       edittext mobile
+       Button button
+     */
     Button register;
     EditText uname;
     EditText mob;
     EditText email;
     Spinner spinner;
+    // local variables to save username and mobile number and email are defined below//
+
+    String user_name;
+    String mobile_number;
+    String mail_id;
+
     SharedPreferences splash;
     SharedPreferences.Editor editor;
+
+    // to check mobile number and email pattern//
+
     String MobilePattern = "[0-9]{10}";
+    String emailPattern = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+    // default constructor //
     public Login() {
         // TODO Auto-generated constructor stub
     }
@@ -41,17 +62,87 @@ public class Login extends Activity {
         initializeviews();
     }
  // To initialize the view in login page and creating a spinner //
+
     public void initializeviews(){
         register=(Button)findViewById(R.id.button);
-        uname=(EditText)findViewById(R.id.editText);
-        email=(EditText)findViewById(R.id.editText2);
-        mob=(EditText)findViewById(R.id.editText3);
+        uname=(EditText)findViewById(R.id.username);
+        email=(EditText)findViewById(R.id.mail);
+        mob=(EditText)findViewById(R.id.mobile);
+        register.setOnClickListener(this);
+
+
+
+        /* spinner need to be populated from the locar server..
+        The below one is a custom spinner
+         */
         spinner=(Spinner)findViewById(R.id.spinner);
         ArrayList<String>al=new ArrayList<String>();
         al.add("Select Country");
         al.add("India");
         ArrayAdapter<String>adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,al);
         spinner.setAdapter(adapter);
+
     }
 
+
+    //*********** to validate the user entered details like username and mobile number************//
+
+    public boolean validate() {
+
+
+        Boolean valid;
+        user_name = uname.getText().toString();
+
+
+
+        if (user_name != null && user_name.length() > 0 ) {
+            valid = true;
+            Log.d("user","111111111111");
+        } else {
+            valid = false;
+        }
+        return valid;
+    }
+
+
+     //******* to validate the mobile number pattern ****** //
+
+    public boolean checknumber(){
+        Boolean valid;
+        mobile_number = mob.getText().toString();
+        Log.d("number","111111111111"+mobile_number);
+        if(mobile_number.length()==10&&mobile_number.matches(MobilePattern)){
+            Log.d("number","111111111111");
+            valid=true;
+        }
+        else{
+            valid= false;
+        }
+        return  valid;
+    }
+
+    //********** to validate the email ***********//
+
+    public boolean checkmail(){
+        mail_id=email.getText().toString().trim();
+        if(mail_id.matches(emailPattern)){
+            return true;
+        }
+        else{
+                          //  email.setBackgroundResource(R.drawable.edit_red_line);
+            return false;
+        }
+    }
+
+    @Override
+    public void onClick(View arg0) {
+        // TODO Auto-generated method stub
+
+        if(validate()&&checknumber()&&checkmail()){
+            Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
+        }
+           else{
+            Toast.makeText(getApplicationContext(),"Incorrect",Toast.LENGTH_SHORT).show();
+        }
+    }
 }
