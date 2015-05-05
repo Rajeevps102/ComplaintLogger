@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">Complaint_Logger</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+     <string name="action_settings">Settings</string>
     <string name="home_select_org">Select an organization</string>
     <string name="home_complaintHeadET">Complaint Head..</string>
     <string name="home_complaintET">Complaint..</string>
