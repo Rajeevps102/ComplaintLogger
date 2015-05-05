@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/spinner"
         android:layout_below="@+id/editText3"
-        android:prompt="@string/spinner_title"
+        android:prompt="@string/login_spinner_title"
         android:layout_centerHorizontal="true" />
 
     <Button
