@@ -22,20 +22,36 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:hint="@string/home_complaintET"
+       android:gravity="start"
         android:id="@+id/home_complaintET" />
 
-    <Button
-        android:layout_width="wrap_content"
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center_vertical"
+        android:layout_weight="1">
+        <Button
+
+        android:layout_width="0dp"
+            android:layout_weight="1"
         android:layout_height="wrap_content"
         android:text="attach button"
         android:id="@+id/button3" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="camera button"
-        android:id="@+id/button2"
-        android:layout_gravity="right" />
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="camera button"
+            android:id="@+id/button2"
+          />
+
+    </LinearLayout>
+
+
 
     <Button
         android:layout_width="wrap_content"
