@@ -27,7 +27,7 @@ public class Splash_screen extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         boolean connected = false;
-        //*** for initializing the chk value to true for first run ***//
+
 
 //the following code checks for internet connectivity of the device and redirects to the home page if network is available and login form is filled
         ConnectivityManager connect = null;
@@ -37,12 +37,13 @@ public class Splash_screen extends Activity {
             NetworkInfo result = connect.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
             if (result != null && result.isConnectedOrConnecting()) {
                 Toast.makeText(getApplicationContext(), "network  available", Toast.LENGTH_LONG).show();
-            } else {
+            }
+            else {
                 result = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 if (result != null && result.isConnectedOrConnecting()) {
                     Toast.makeText(getApplicationContext(), "network  available", Toast.LENGTH_LONG).show();
 
-
+                    //for initializing the chk value to true for first run
                     sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
                     editor = sp.edit();
                     chk = sp.getBoolean("isonetime", true);
