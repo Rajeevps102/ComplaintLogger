@@ -1,10 +1,14 @@
 package complaintloggger.wiztelapp.com.complaint_logger;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -17,77 +21,65 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
-public class Servicehandler {
+public class Servicehandler  {
 	static InputStream is = null;
 	static String response = null;
 	public final static int GET = 1;
 	public final static int POST = 2;
-
+    HttpURLConnection urlConnection;
 	public Servicehandler() {
 
 	}
 
-	public String makeServiceCall(String url, int method) {
-		return this.makeServiceCall(url, method, null);
-	}
 
-	public String makeServiceCall(String url, int method,
-			List<NameValuePair> params) {
-		try {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
+    public String makeServiceCall(String url1) {
+        try {
 
-			HttpEntity httpEntity = null;
-			HttpResponse httpResponse = null;
+            Log.d("inside make","handler"+url1);
+            URL url = new URL(url1);
+            urlConnection = (HttpURLConnection) url.openConnection();
 
-			if (method == POST) {
-				HttpPost httpPost = new HttpPost(url);
+                InputStream in =urlConnection.getInputStream();
+            Log.d("inside make","111111111111111111111111111111111111"+urlConnection.getInputStream());
+           // InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedReader reader=new BufferedReader(new InputStreamReader(in));
+           // BufferedReader reader=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            Log.d("inside make","handler11111111111111111111111111111111111111111");
+            while ((line = reader.readLine()) != null) {
 
-				if (params != null) {
-					httpPost.setEntity(new UrlEncodedFormEntity(params));
-				}
+                sb.append(line + "\n");
+            }
 
-				httpResponse = httpClient.execute(httpPost);
+                is.close();
 
-			} else if (method == GET) {
+              response=sb.toString();
 
-				if (params != null) {
-					String paramString = URLEncodedUtils
-							.format(params, "utf-8");
-					url += "?" + paramString;
-				}
-				HttpGet httpGet = new HttpGet(url);
 
-				httpResponse = httpClient.execute(httpGet);
+        }
 
-			}
-			httpEntity = httpResponse.getEntity();
-			is = httpEntity.getContent();
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            Log.e("Buffer Error", "Error: " + e.toString());
+        }
+        finally {
+            urlConnection.disconnect();
+        }
 
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					is, "UTF-8"), 8);
-			StringBuilder sb = new StringBuilder();
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-			is.close();
-			response = sb.toString();
-		} catch (Exception e) {
-			Log.e("Buffer Error", "Error: " + e.toString());
-		}
 
-		return response;
-	}
+
+        return response;
+    }
 }

@@ -2,6 +2,7 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +38,10 @@ public class Login extends Activity implements View.OnClickListener {
 
     SharedPreferences splash;
     SharedPreferences.Editor editor;
+    Servicehandler servicehandler=new Servicehandler();
+    Fetchspinner spn=new Fetchspinner();
+    static String url="http://10.0.0.108/muncipality/addcomplaint.php";
+    ArrayList<String> spinner_list=new ArrayList<String>(); //**** list to populate the spinner****//
 
     // to check mobile number and email pattern//
 
@@ -49,6 +54,7 @@ public class Login extends Activity implements View.OnClickListener {
     }
 
     // constructor to initialize one time check in splash screen//
+
     public Login(SharedPreferences sp, SharedPreferences.Editor editor2) {
         // TODO Auto-generated constructor stub
         this.splash=sp;
@@ -81,6 +87,10 @@ public class Login extends Activity implements View.OnClickListener {
         al.add("India");
         ArrayAdapter<String>adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,al);
         spinner.setAdapter(adapter);
+
+
+        spn.execute(url);
+
 
     }
 
@@ -144,5 +154,18 @@ public class Login extends Activity implements View.OnClickListener {
            else{
             Toast.makeText(getApplicationContext(),"Incorrect",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public  class Fetchspinner extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... strings) {
+            Log.d("raju",""+strings[0]);
+          String result= servicehandler.makeServiceCall(strings[0]);
+
+             return  null;
+        }
+
+
+
     }
 }
