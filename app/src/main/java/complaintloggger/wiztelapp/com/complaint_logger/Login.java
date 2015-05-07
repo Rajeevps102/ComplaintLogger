@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -89,13 +90,31 @@ public class Login extends Activity implements View.OnClickListener {
          */
         spinner=(Spinner)findViewById(R.id.spinner);
         ArrayList<String>al=new ArrayList<String>();
-        al.add("Select Country");
-        al.add("India");
+       spinner_list.add("Select Country");
+      /*  al.add("India");
         ArrayAdapter<String>adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,al);
-        spinner.setAdapter(adapter);
+        spinner.setAdapter(adapter); */
 
 
         spn.execute(url);
+        ArrayAdapter<String>adapter=new ArrayAdapter<String>(getApplicationContext(),R.layout.spinner_item,spinner_list);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+               String countryString=spinner_list.get(position);
+                if(countryString=="Select Country"){
+                    spinner_list.remove(0);
+                }
+
+               // Toast.makeText(getApplicationContext(),countryString,Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
 
     }
@@ -179,7 +198,9 @@ public class Login extends Activity implements View.OnClickListener {
 
                 for(Integer i=0;i<jsonArray.length();i++){
                     j=jsonArray.getJSONObject(i);
-                    Log.d("json result","111111111111"+j.getString("organization_country"));
+                    String list=j.getString("organization_country");
+                    spinner_list.add(list);
+                    Log.d("result","111111111111111111111111"+j.getString("organization_country"));
                 }
             }
 

@@ -61,7 +61,7 @@ public class Splash_screen extends Activity {
                                 Log.d("tag", "boolean" + chk);
 
                                 Login l = new Login(sp, editor);
-                                Intent i = new Intent(Splash_screen.this, Home.class); // has to corrected as intent to home.class pn completion of test
+                                Intent i = new Intent(Splash_screen.this, Login.class); // has to corrected as intent to home.class pn completion of test
                                 startActivity(i);
                                 finish();
                             } else {
