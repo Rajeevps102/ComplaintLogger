@@ -12,6 +12,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -40,7 +46,7 @@ public class Login extends Activity implements View.OnClickListener {
     SharedPreferences.Editor editor;
     Servicehandler servicehandler=new Servicehandler();
     Fetchspinner spn=new Fetchspinner();
-    static String url="http://10.0.0.108/muncipality/addcomplaint.php";
+    static String url="http://10.0.0.108/complaintlogger/addcomplaint.php";
     ArrayList<String> spinner_list=new ArrayList<String>(); //**** list to populate the spinner****//
 
     // to check mobile number and email pattern//
@@ -150,6 +156,8 @@ public class Login extends Activity implements View.OnClickListener {
 
         if(validate()&&checknumber()&&checkmail()){
             Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
+
+            addingjsonvalues();
         }
            else{
             Toast.makeText(getApplicationContext(),"Incorrect",Toast.LENGTH_SHORT).show();
@@ -161,6 +169,26 @@ public class Login extends Activity implements View.OnClickListener {
         protected Void doInBackground(String... strings) {
             Log.d("raju",""+strings[0]);
           String result= servicehandler.makeServiceCall(strings[0]);
+            Log.d("result","111111111111111111111111"+result);
+
+            try {
+                JSONArray jsonArray=null;
+                JSONObject j=null;
+                JSONObject jsonObject = new JSONObject(result);
+                jsonArray=jsonObject.getJSONArray("country");
+
+                for(Integer i=0;i<jsonArray.length();i++){
+                    j=jsonArray.getJSONObject(i);
+                    Log.d("json result","111111111111"+j.getString("organization_country"));
+                }
+            }
+
+             catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+
 
              return  null;
         }
@@ -168,4 +196,26 @@ public class Login extends Activity implements View.OnClickListener {
 
 
     }
+
+    // to add json values like username mobile ...etc//
+
+    public void addingjsonvalues(){
+
+
+
+
+    }
+
+
+    // implementing the interface for json response for userdata//
+
+Login_interface login_interface=new Login_interface() {
+    @Override
+    public void oncompletion(JSONObject json) {
+
+
+
+    }
+};
+
 }

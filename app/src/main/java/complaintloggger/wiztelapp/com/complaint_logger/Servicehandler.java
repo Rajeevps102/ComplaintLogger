@@ -20,11 +20,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class Servicehandler  {
+public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 	static InputStream is = null;
 	static String response = null;
 	public final static int GET = 1;
@@ -33,6 +34,7 @@ public class Servicehandler  {
 	public Servicehandler() {
 
 	}
+
 
 
 
@@ -49,16 +51,13 @@ public class Servicehandler  {
             BufferedReader reader=new BufferedReader(new InputStreamReader(in));
            // BufferedReader reader=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             StringBuilder sb = new StringBuilder();
-            String line = null;
-            Log.d("inside make","handler11111111111111111111111111111111111111111");
-            while ((line = reader.readLine()) != null) {
+            response = reader.readLine();
+            Log.d("inside make","handler11111111111111111111111111111111111111111"+response);
 
-                sb.append(line + "\n");
-            }
 
                 is.close();
 
-              response=sb.toString();
+
 
 
         }
@@ -82,4 +81,10 @@ public class Servicehandler  {
 
         return response;
     }
+
+    @Override
+    protected JSONObject doInBackground(String... strings) {
+        return null;
+    }
+
 }
