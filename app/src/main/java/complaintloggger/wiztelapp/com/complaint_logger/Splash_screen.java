@@ -27,42 +27,63 @@ public class Splash_screen extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         boolean connected = false;
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
-            //we are connected to a network
-            connected = true;
 
-            //*** for initializing the chk value to true for first run ***//
-            sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
-            editor = sp.edit();
-            chk = sp.getBoolean("isonetime", true);
 
-            //*** Thread for creating the delay for splash screen***//
+//the following code checks for internet connectivity of the device and redirects to the home page if network is available and login form is filled
+        ConnectivityManager connect = null;
+        connect = (ConnectivityManager) this.getSystemService(this.CONNECTIVITY_SERVICE);
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                    if (chk) {
+        if (connect != null) {
+            NetworkInfo result = connect.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+            if (result != null && result.isConnectedOrConnecting()) {
+                Toast.makeText(getApplicationContext(), "network  available", Toast.LENGTH_LONG).show();
+            }
+            else {
+                result = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+                if (result != null && result.isConnectedOrConnecting()) {
+                    Toast.makeText(getApplicationContext(), "network  available", Toast.LENGTH_LONG).show();
 
-                        //	editor.putBoolean("isonetime",false);
-                        //	editor.commit();
-                        Log.d("tag", "boolean" + chk);
+                    //for initializing the chk value to true for first run
+                    sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
+                    editor = sp.edit();
+                    chk = sp.getBoolean("isonetime", true);
 
-                        Login l = new Login(sp, editor);
-                        Intent i = new Intent(Splash_screen.this, Login.class);
-                        startActivity(i);
-                        finish();
-                    } else {
+                    //Thread for creating the delay for splash screen
 
-                        Intent j = new Intent(Splash_screen.this, Home.class);
-                        startActivity(j);
-                        finish();
-                    }
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // TODO Auto-generated method stub
+                            if (chk) {
+
+                                //	editor.putBoolean("isonetime",false);
+                                //	editor.commit();
+                                Log.d("tag", "boolean" + chk);
+
+                                Login l = new Login(sp, editor);
+                                Intent i = new Intent(Splash_screen.this, Home.class); // has to corrected as intent to home.class pn completion of test
+                                startActivity(i);
+                                finish();
+                            } else {
+
+                                Intent j = new Intent(Splash_screen.this, Home.class);
+                                startActivity(j);
+                                finish();
+                            }
+                        }
+                    }, SPLASH_TIME_OUT);
+                } else {
+                    Toast.makeText(getApplicationContext(), "network not available", Toast.LENGTH_LONG).show();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+
+
+                            System.exit(0);
+                        }
+                    }, SPLASH_TIME_OUT);
                 }
-            }, SPLASH_TIME_OUT);
-
+            }
         } else {
             Toast.makeText(getApplicationContext(), "network not available", Toast.LENGTH_LONG).show();
             new Handler().postDelayed(new Runnable() {
