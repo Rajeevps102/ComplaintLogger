@@ -8,10 +8,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/spinner"
-        android:hint="select an option"
-        android:textColorHint="#FF0000"
         android:textColor="@android:color/white"
-        android:prompt="@string/login_spinner_title"
+
 
         android:layout_below="@+id/mail"
         android:layout_alignParentLeft="true"

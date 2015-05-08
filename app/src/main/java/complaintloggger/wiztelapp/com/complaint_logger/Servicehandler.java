@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -22,20 +23,33 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 	static InputStream is = null;
 	static String response = null;
-	public final static int GET = 1;
-	public final static int POST = 2;
     HttpURLConnection urlConnection;
+
+    Context context;
+    JSONObject jsonObject;
+    Login_interface login_interface;
 	public Servicehandler() {
 
 	}
 
+    public Servicehandler(Context context,JSONObject j,Login_interface listener) {
+        // TODO Auto-generated constructor stub
+        this.context=context;
+        this.jsonObject=j;
+        this.login_interface=listener;
+    }
 
+/*  makeServiceCall(String url1) is for getting the spinner value from the server
+    Service handler class itself extends from async task to integrate webservice
+    for login module
+ */
 
 
     public String makeServiceCall(String url1) {
@@ -82,8 +96,74 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
         return response;
     }
 
+
+    // function to call webservice for login in user information //
+
+    public JSONObject login_webservice(String url1){
+
+        try {
+            Log.d("rajeev","inside service handler webservice");
+            URL url = new URL(url1);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+
+            urlConnection.setRequestProperty("Accept", "application/json");
+
+           urlConnection.setRequestMethod("POST");
+            urlConnection.connect();
+            OutputStreamWriter wr= new OutputStreamWriter(urlConnection.getOutputStream());
+            Log.d("rajeev","sending json data"+jsonObject.toString());
+            String eg=jsonObject.toString();
+            wr.write(eg);
+
+            wr.flush();
+            wr.close();
+
+            StringBuilder sb = new StringBuilder();
+
+            int HttpResult =urlConnection.getResponseCode();
+
+            if(HttpResult ==HttpURLConnection.HTTP_OK){
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"utf-8"));
+
+                String line = br.readLine();
+                Log.d("rajeev","111111111111"+line);
+
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+
+                br.close();
+
+                System.out.println(""+sb.toString());
+
+            }
+
+
+        }
+        catch (Exception e) {
+
+            e.printStackTrace();
+            return null;
+
+        } finally {
+
+            if(urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+        return null;
+    }
+
     @Override
     protected JSONObject doInBackground(String... strings) {
+
+        Log.d("rajeev","inside service handler");
+        login_webservice(strings[0]);
         return null;
     }
 

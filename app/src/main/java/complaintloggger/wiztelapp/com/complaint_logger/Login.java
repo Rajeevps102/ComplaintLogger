@@ -42,6 +42,7 @@ public class Login extends Activity implements View.OnClickListener {
     String user_name;
     String mobile_number;
     String mail_id;
+    String countryString;
 
     SharedPreferences splash;
     SharedPreferences.Editor editor;
@@ -86,16 +87,16 @@ public class Login extends Activity implements View.OnClickListener {
 
 
         /* spinner need to be populated from the locar server..
-        The below one is a custom spinner
+        select country is a coustom added data
          */
         spinner=(Spinner)findViewById(R.id.spinner);
-        ArrayList<String>al=new ArrayList<String>();
-       spinner_list.add("Select Country");
-      /*  al.add("India");
-        ArrayAdapter<String>adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,al);
-        spinner.setAdapter(adapter); */
 
 
+
+
+        spinner_list.add("Select country");
+      //  spinner.setPrompt("country");
+// calling the web service to Fetchspinner class doinbackground //
         spn.execute(url);
         ArrayAdapter<String>adapter=new ArrayAdapter<String>(getApplicationContext(),R.layout.spinner_item,spinner_list);
         spinner.setAdapter(adapter);
@@ -103,9 +104,11 @@ public class Login extends Activity implements View.OnClickListener {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-               String countryString=spinner_list.get(position);
-                if(countryString=="Select Country"){
-                    spinner_list.remove(0);
+
+                countryString=spinner_list.get(position);
+                if(countryString=="Select country"){
+               
+
                 }
 
                // Toast.makeText(getApplicationContext(),countryString,Toast.LENGTH_LONG).show();
@@ -174,7 +177,7 @@ public class Login extends Activity implements View.OnClickListener {
         // TODO Auto-generated method stub
 
         if(validate()&&checknumber()&&checkmail()){
-            Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
 
             addingjsonvalues();
         }
@@ -182,6 +185,8 @@ public class Login extends Activity implements View.OnClickListener {
             Toast.makeText(getApplicationContext(),"Incorrect",Toast.LENGTH_SHORT).show();
         }
     }
+
+    // class to perform fetching data from server to populate spinner //
 
     public  class Fetchspinner extends AsyncTask<String, Void, Void> {
         @Override
@@ -199,6 +204,7 @@ public class Login extends Activity implements View.OnClickListener {
                 for(Integer i=0;i<jsonArray.length();i++){
                     j=jsonArray.getJSONObject(i);
                     String list=j.getString("organization_country");
+
                     spinner_list.add(list);
                     Log.d("result","111111111111111111111111"+j.getString("organization_country"));
                 }
@@ -211,9 +217,9 @@ public class Login extends Activity implements View.OnClickListener {
 
 
 
+
              return  null;
         }
-
 
 
     }
@@ -222,9 +228,26 @@ public class Login extends Activity implements View.OnClickListener {
 
     public void addingjsonvalues(){
 
+    user_name=uname.getText().toString();
+    mobile_number=mob.getText().toString();
+    mail_id=email.getText().toString();
 
+        JSONObject jsonObject =new JSONObject();
+        try{
+            jsonObject.put("status","login");
+            jsonObject.put("username",user_name);
+            jsonObject.put("mobile",mobile_number);
+            jsonObject.put("email",mail_id);
+            jsonObject.put("country",countryString);
+        }
+        catch(JSONException e){
+            e.printStackTrace();
 
+        }
+         String login_url="http://10.0.0.108/complaintlogger/login.php";
+        servicehandler=new Servicehandler(Login.this,jsonObject,login_interface);
 
+          servicehandler.execute(login_url);
     }
 
 
