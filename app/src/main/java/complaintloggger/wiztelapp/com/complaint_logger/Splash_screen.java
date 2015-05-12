@@ -46,7 +46,8 @@ public class Splash_screen extends Activity {
                     //for initializing the chk value to true for first run
                     sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
                     editor = sp.edit();
-                    chk = sp.getBoolean("isonetime", true);
+                    chk = sp.getBoolean("firstlogin", true);
+
 
                     //Thread for creating the delay for splash screen
 

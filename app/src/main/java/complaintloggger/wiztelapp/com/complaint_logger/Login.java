@@ -107,10 +107,7 @@ public class Login extends Activity implements View.OnClickListener {
 
 
                 countryString=spinner_list.get(position);
-                splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
-                editor = splash.edit();
-                editor.putString("selected country name",countryString);
-                editor.putBoolean("isonetime",false);
+
                 if(countryString=="Select country"){
 
 
@@ -183,6 +180,11 @@ public class Login extends Activity implements View.OnClickListener {
 
         if(validate()&&checknumber()&&checkmail()){
           //  Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
+            splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
+            editor = splash.edit();
+            editor.putString("selected country name",countryString);
+            editor.putBoolean("firstlogin",false);
+            editor.commit();
 
             addingjsonvalues();
         }
