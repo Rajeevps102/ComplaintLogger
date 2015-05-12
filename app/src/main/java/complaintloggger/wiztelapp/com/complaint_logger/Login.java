@@ -2,6 +2,7 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ public class Login extends Activity implements View.OnClickListener {
     EditText mob;
     EditText email;
     Spinner spinner;
+    Integer id;
     // local variables to save username and mobile number and email are defined below//
 
     String user_name;
@@ -264,8 +266,20 @@ Login_interface login_interface=new Login_interface() {
     @Override
     public void oncompletion(JSONObject json) {
 
+        Log.d("final json from net", "111111111111" + json);
+        try {
+            id = json.getInt("id");
+            Log.d("userid", "isssssssssss" + id);
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-
+        splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
+        editor = splash.edit();
+        editor.putInt("id",id);
+        editor.commit();
+        Intent home=new Intent(Login.this,Home.class);
     }
 };
 

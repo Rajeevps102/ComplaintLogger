@@ -21,6 +21,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -131,24 +132,28 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
                 BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"utf-8"));
 
                 String line = br.readLine();
-                Log.d("rajeev","111111111111"+line);
 
-                while ((line = br.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
+                Log.d("rajeev","111111111111"+line);
+                JSONObject jsonobj=new JSONObject(line);
+
 
                 br.close();
+                return  jsonobj;
 
-                System.out.println(""+sb.toString());
+
+
 
             }
 
 
         }
+        catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         catch (Exception e) {
 
             e.printStackTrace();
-            return null;
 
         } finally {
 
@@ -170,5 +175,6 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
     @Override
     protected void onPostExecute(JSONObject jsonObject) {
         super.onPostExecute(jsonObject);
+        login_interface.oncompletion(jsonObject);
     }
 }
