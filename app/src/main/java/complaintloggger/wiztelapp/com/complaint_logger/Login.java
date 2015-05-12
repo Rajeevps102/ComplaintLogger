@@ -1,6 +1,7 @@
 package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -106,6 +107,10 @@ public class Login extends Activity implements View.OnClickListener {
 
 
                 countryString=spinner_list.get(position);
+                splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
+                editor = splash.edit();
+                editor.putString("selected country name",countryString);
+                editor.putBoolean("isonetime",false);
                 if(countryString=="Select country"){
 
 

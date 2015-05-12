@@ -163,8 +163,12 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
     protected JSONObject doInBackground(String... strings) {
 
         Log.d("rajeev","inside service handler");
-        login_webservice(strings[0]);
-        return null;
+        return login_webservice(strings[0]);
+
     }
 
+    @Override
+    protected void onPostExecute(JSONObject jsonObject) {
+        super.onPostExecute(jsonObject);
+    }
 }
