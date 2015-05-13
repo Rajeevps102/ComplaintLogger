@@ -51,7 +51,7 @@ public class Login extends Activity implements View.OnClickListener {
     SharedPreferences.Editor editor;
     Servicehandler servicehandler=new Servicehandler();
     Fetchspinner spn=new Fetchspinner();
-    static String url="http://10.0.0.128/complaintlogger/addcomplaint.php";
+    static String url="http://10.0.0.127/complaintlogger/addcomplaint.php";
     ArrayList<String> spinner_list=new ArrayList<String>(); //**** list to populate the spinner****//
 
     // to check mobile number and email pattern//
@@ -184,7 +184,7 @@ public class Login extends Activity implements View.OnClickListener {
           //  Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
             splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
             editor = splash.edit();
-            editor.putString("selected country name",countryString);
+            editor.putString("selectedcountryname",countryString);
             editor.putBoolean("firstlogin",false);
             editor.commit();
 
@@ -253,7 +253,7 @@ public class Login extends Activity implements View.OnClickListener {
             e.printStackTrace();
 
         }
-         String login_url="http://10.0.0.128/complaintlogger/login.php";
+         String login_url="http://10.0.0.127/complaintlogger/login.php";
         servicehandler=new Servicehandler(Login.this,jsonObject,login_interface);
 
           servicehandler.execute(login_url);

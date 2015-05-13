@@ -97,6 +97,50 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
         return response;
     }
 
+    public String makeServiceCall(String url1, String country) {
+        try {
+
+            Log.d("jobin","in make service call fetch organization the url recieved is "+url1+" and country selected is "+country);
+            URL url = new URL(url1);
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            InputStream in =urlConnection.getInputStream();
+            Log.d("jobin","inputstream recieved"+urlConnection.getInputStream());
+            // InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedReader reader=new BufferedReader(new InputStreamReader(in));
+            // BufferedReader reader=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            response = reader.readLine();
+            Log.d("jobin","response is:  "+response);
+
+
+            is.close();
+
+
+
+
+        }
+
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            Log.e("Buffer Error", "Error: " + e.toString());
+        }
+        finally {
+            urlConnection.disconnect();
+        }
+
+
+
+
+        return response;
+    }
+
 
     // function to call webservice for login in user information //
 
