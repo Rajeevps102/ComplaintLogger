@@ -100,4 +100,6 @@ public class Splash_screen extends Activity {
 
     }
 
+
+
 }

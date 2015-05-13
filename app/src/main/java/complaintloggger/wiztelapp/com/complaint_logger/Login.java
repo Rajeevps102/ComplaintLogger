@@ -182,10 +182,11 @@ public class Login extends Activity implements View.OnClickListener {
 
         if(validate()&&checknumber()&&checkmail()){
           //  Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
+            Log.d("country","33333333333330"+countryString);
             splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
             editor = splash.edit();
-            editor.putString("selected country name",countryString);
-            editor.putBoolean("firstlogin",false);
+            editor.putString("selectedcountryname",countryString);
+
             editor.commit();
 
             addingjsonvalues();
@@ -278,8 +279,10 @@ Login_interface login_interface=new Login_interface() {
         splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
         editor = splash.edit();
         editor.putInt("id",id);
+        editor.putBoolean("firstlogin",false);
         editor.commit();
         Intent home=new Intent(Login.this,Home.class);
+        startActivity(home);
     }
 };
 
