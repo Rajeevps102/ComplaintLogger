@@ -96,7 +96,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
         return response;
     }
-
+/*
     public String makeServiceCall(String url1, String country) {
         try {
 
@@ -141,7 +141,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
         return response;
     }
 
-
+*/
     // function to call webservice for login in user information //
 
     public JSONObject login_webservice(String url1){
@@ -220,5 +220,130 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
     protected void onPostExecute(JSONObject jsonObject) {
         super.onPostExecute(jsonObject);
         login_interface.oncompletion(jsonObject);
+    }
+
+    // for updating company name in home page spinner//
+
+    public String makeServiceCall(String url1, String country) {
+        try {
+
+            JSONObject jsonObject1=new JSONObject();
+            jsonObject1.put("country",country);
+            Log.d("jobin","in make service call fetch organization the url recieved is "+url1+" and country selected is "+country);
+            URL url = new URL(url1);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+
+            urlConnection.setRequestProperty("Accept", "application/json");
+
+            urlConnection.setRequestMethod("POST");
+            urlConnection.connect();
+            OutputStreamWriter wr= new OutputStreamWriter(urlConnection.getOutputStream());
+            Log.d("rajeev","sending json data"+jsonObject1.toString());
+           // String eg=jsonObject.toString();
+            wr.write(jsonObject1.toString());
+
+            wr.flush();
+            wr.close();
+            int HttpResult =urlConnection.getResponseCode();
+            if(HttpResult ==HttpURLConnection.HTTP_OK) {
+                InputStream in = urlConnection.getInputStream();
+                Log.d("jobin", "inputstream recieved" + urlConnection.getInputStream());
+                // InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                // BufferedReader reader=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                response = reader.readLine();
+                Log.d("jobin", "response is:  " + response);
+
+
+                is.close();
+
+
+            }
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+
+        }
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            Log.e("Buffer Error", "Error: " + e.toString());
+        }
+        finally {
+            urlConnection.disconnect();
+        }
+
+
+
+
+        return response;
+    }
+
+    public String makeServiceCall(String url1, String        json,Integer i) {
+
+        try {
+
+
+            Log.d("jobin", "in make service call fetch organization the url recieved is " + url1 + " and country selected is " + json);
+            URL url = new URL(url1);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+
+            urlConnection.setRequestProperty("Accept", "application/json");
+
+            urlConnection.setRequestMethod("POST");
+            urlConnection.connect();
+            OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
+            wr.write(json);
+            wr.flush();
+            wr.close();
+            int HttpResult =urlConnection.getResponseCode();
+            if(HttpResult ==HttpURLConnection.HTTP_OK) {
+                InputStream in = urlConnection.getInputStream();
+                Log.d("jobin", "inputstream recieved" + urlConnection.getInputStream());
+                // InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                // BufferedReader reader=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                response = reader.readLine();
+                Log.d("jobin", "response is:  " + response);
+
+
+                is.close();
+
+
+            }
+
+        }
+
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            Log.e("Buffer Error", "Error: " + e.toString());
+        }
+        finally {
+            urlConnection.disconnect();
+        }
+
+
+
+        return response;
+
     }
 }

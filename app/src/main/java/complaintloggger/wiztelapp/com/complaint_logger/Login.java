@@ -182,10 +182,11 @@ public class Login extends Activity implements View.OnClickListener {
 
         if(validate()&&checknumber()&&checkmail()){
           //  Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
+            Log.d("country","33333333333330"+countryString);
             splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
             editor = splash.edit();
             editor.putString("selectedcountryname",countryString);
-            editor.putBoolean("firstlogin",false);
+
             editor.commit();
 
             addingjsonvalues();
@@ -253,7 +254,7 @@ public class Login extends Activity implements View.OnClickListener {
             e.printStackTrace();
 
         }
-         String login_url="http://10.0.0.127/complaintlogger/login.php";
+         String login_url="http://10.0.0.128/complaintlogger/login.php";
         servicehandler=new Servicehandler(Login.this,jsonObject,login_interface);
 
           servicehandler.execute(login_url);
@@ -278,8 +279,10 @@ Login_interface login_interface=new Login_interface() {
         splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
         editor = splash.edit();
         editor.putInt("id",id);
+        editor.putBoolean("firstlogin",false);
         editor.commit();
         Intent home=new Intent(Login.this,Home.class);
+        startActivity(home);
     }
 };
 

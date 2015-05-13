@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -24,14 +25,17 @@ import java.util.ArrayList;
 /**
  * Created by Raju on 04-05-2015.
  */
-public class Home extends ActionBarActivity{
+public class Home extends ActionBarActivity implements View.OnClickListener{
 
     Servicehandler servicehandler = new Servicehandler();
     Spinner organizationListSpinner;
     SharedPreferences sp;
     SharedPreferences.Editor editor;
     String selctedcountryname;
-    static String url = "http://10.0.0.127/complaintlogger/fetchorglist.php";
+    String json_string;//for json string
+    Complaint_webservice complaint_webservice=new Complaint_webservice();
+    static String url = "http://10.0.0.128/complaintlogger/fetchorglist.php";
+    static String complaint_url="http://10.0.0.128/complaintlogger/fetchorglist.php";
     /*The home class is loaded on successful user verification at the login process. the Home class
      displays options to
       1. choose an organization by fetching from the database
@@ -49,7 +53,8 @@ public class Home extends ActionBarActivity{
 
    }
 
-    EditText home_complaintHeadET,home_complaintET;  // edit text that receive complaint subject and complaint
+    EditText home_complaintHeadET,home_complaintET; // edit text that receive complaint subject and complaint
+    Button submit;
     String ComplaintHeadString, ComplaintString,OrganizationString; //string that store complaint subject  complaint, and organization name that is selected from spinner
 
 
@@ -62,22 +67,41 @@ public class Home extends ActionBarActivity{
 
         home_complaintHeadET=(EditText)findViewById(R.id.home_complaintHeadET);
         home_complaintET=(EditText)findViewById(R.id.home_complaintET);
+        submit=(Button)findViewById(R.id.button);
+        submit.setOnClickListener(this);
         sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
         editor = sp.edit();
-        selctedcountryname = sp.getString("selectedcountryname", "default");
-
+        selctedcountryname = sp.getString("selectedcountryname", "");
+        Log.d("country","33333333333330"+selctedcountryname);
         organizationListSpinner = (Spinner) findViewById(R.id.organizationListSpinner);
 
         fetchorg.execute(selctedcountryname);
 
     }
 
+    @Override
+    public void onClick(View view) {
+        addingjsonvalues();
+    }
 
+public void addingjsonvalues()
+{
+   ComplaintHeadString=home_complaintHeadET.getText().toString();
+    ComplaintString=home_complaintET.getText().toString();
+    JSONObject jsonObject=new JSONObject();
+    try {
+        jsonObject.put("status","complaint");
+        jsonObject.put("header", ComplaintHeadString);
+        jsonObject.put("complaint",ComplaintString);
+        jsonObject.put("organization",OrganizationString);
+    }
+    catch(JSONException e){
+        e.printStackTrace();
+    }
+    complaint_webservice.execute(jsonObject.toString());
+}
 
-
-
-
-    //////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 
     public class Fetchorganization extends AsyncTask<String, Void, Void> {
 
@@ -142,6 +166,27 @@ public class Home extends ActionBarActivity{
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
+    // to register a complaint to server//
+public class Complaint_webservice extends AsyncTask<String, Void, String> {
 
+        Complaint_webservice(){
+
+        }
+    @Override
+    protected String doInBackground(String... strings) {
+        Log.d("json","11111111"+strings[0]);
+      String result=servicehandler.makeServiceCall(complaint_url,strings[0],0);
+
+        return result;
+
+    }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d("rajeev","111111111"+s);
+
+        }
+    }
 
 }

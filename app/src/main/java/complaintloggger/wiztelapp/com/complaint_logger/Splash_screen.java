@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class Splash_screen extends Activity {
 
     Boolean chk;  //******Variable to check the first time login****//
-    private static int SPLASH_TIME_OUT = 9000;
+    private static int SPLASH_TIME_OUT = 3000;
     SharedPreferences sp;
 
     SharedPreferences.Editor editor;
