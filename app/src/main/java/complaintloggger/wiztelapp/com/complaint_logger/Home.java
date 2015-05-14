@@ -276,6 +276,7 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
             Log.d("jobin", "setting bitmap");
 
             Bitmap bp = (Bitmap) data.getExtras().get("data");
+
             home_compalintImg3.setImageBitmap(bitmap);
             home_compalintImg2.setImageBitmap(bitmap);
             home_compalintImg1.setImageBitmap(bitmap);
