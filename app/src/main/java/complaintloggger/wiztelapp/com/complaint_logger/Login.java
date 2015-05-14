@@ -51,7 +51,7 @@ public class Login extends Activity implements View.OnClickListener {
     SharedPreferences.Editor editor;
     Servicehandler servicehandler=new Servicehandler();
     Fetchspinner spn=new Fetchspinner();
-    static String url="http://10.0.0.127/complaintlogger/addcomplaint.php";
+    static String url="http://10.0.0.128/complaintlogger/addcomplaint.php";
     ArrayList<String> spinner_list=new ArrayList<String>(); //**** list to populate the spinner****//
 
     // to check mobile number and email pattern//
