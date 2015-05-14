@@ -87,12 +87,12 @@
                 android:layout_weight="1"
                 android:padding="5dp"
                 android:layout_height="90dp"
-                android:src="@mipmap/b"
+
                 android:id="@+id/home_compalintImg2"/>
 
             <ImageView
                 android:layout_width="0dp"
-                android:src="@mipmap/c"
+
                 android:layout_weight="1"
                 android:padding="5dp"
                 android:layout_height="90dp"

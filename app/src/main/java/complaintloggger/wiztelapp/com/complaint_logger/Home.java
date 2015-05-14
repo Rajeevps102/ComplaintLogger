@@ -62,8 +62,8 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
 
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
-    static String url = "http://10.0.0.127/complaintlogger/fetchorglist.php";
-    static String complaint_url = "http://10.0.0.127/complaintlogger/fetchorglist.php";
+    static String url = "http://10.0.0.128/complaintlogger/fetchorg.php";
+    static String complaint_url = "http://10.0.0.128/complaints/.php";
     private Uri fileUri;
     /*The home class is loaded on successful user verification at the login process. the Home class
      displays options to
@@ -118,7 +118,9 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.home_submitBtn: addingjsonvalues() ;
+                break;
             case R.id.home_camera:opencamera();
+                break;
         }
     }
 
@@ -233,7 +235,7 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
         Log.d("jobin", "in the open camera function");
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);// declare the intent for camera
         fileUri = getOutputMediaFileUri();// this function call will eventually return the name to be assigned for the photo
-
+       Log.d("jobin", "fileuri recieved is "+fileUri);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);// adds name as PutExtra feature
         startActivityForResult(intent, 1);// starts the intent to camera
 
@@ -243,6 +245,8 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
         // TODO Auto-generated method stub
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("jobin", "data recieved is "+data);
+
+
     if(resultCode==0)
     {
           //opencamera();
@@ -251,6 +255,8 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
 
 
      else   if(requestCode==1)  {
+
+
 
             String demo=compressImage(fileUri.getPath());
 
@@ -275,26 +281,13 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
 
             Log.d("jobin", "setting bitmap");
 
-            Bitmap bp = (Bitmap) data.getExtras().get("data");
-
+           // Bitmap bp = (Bitmap) data.getExtras().get("data");
             home_compalintImg3.setImageBitmap(bitmap);
             home_compalintImg2.setImageBitmap(bitmap);
             home_compalintImg1.setImageBitmap(bitmap);
-            RetrieveFeedTask obj= new RetrieveFeedTask();
-            obj.execute("");
+          //  RetrieveFeedTask obj= new RetrieveFeedTask();
+           // obj.execute("");
 
-        }
-        else if(requestCode==2)
-        {
-            Double j=data.getDoubleExtra("value", 0);
-            Double k=data.getDoubleExtra("value2", 0);
-            Log.d("jobin", "inside result"+j);
-            Log.d("jobin", "inside result"+k);
-            loc=Double.toString(j);
-
-            //  loc=String.valueOf(j);
-
-            Log.d("jobin", "inside result"+loc);
         }
 
     }
