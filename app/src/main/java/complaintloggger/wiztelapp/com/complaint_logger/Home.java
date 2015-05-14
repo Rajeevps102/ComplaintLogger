@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -54,16 +55,18 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     SharedPreferences sp;
     SharedPreferences.Editor editor;
     String selctedcountryname;
+    Integer userid;
     public static String timeStamp;
     ImageView home_compalintImg3,home_compalintImg2,home_compalintImg1;
     String loc;
+    public Integer count=0;
     static String dirname = "ComplaintLogger";
     ImageView camera, attach;
-
+ProgressBar pg;
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
     static String url = "http://10.0.0.128/complaintlogger/fetchorg.php";
-    static String complaint_url = "http://10.0.0.128/complaints/.php";
+    static String complaint_url = "http://10.0.0.128/complaintlogger/complaints.php";
     private Uri fileUri;
     /*The home class is loaded on successful user verification at the login process. the Home class
      displays options to
@@ -96,11 +99,14 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
         home_complaintHeadET = (EditText) findViewById(R.id.home_complaintHeadET);
         home_complaintET = (EditText) findViewById(R.id.home_complaintET);
         submit = (Button) findViewById(R.id.home_submitBtn);
+        pg=(ProgressBar)findViewById(R.id.pbHeaderProgress);
+        pg.setVisibility(View.GONE);
         submit.setOnClickListener(this);
         sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
         editor = sp.edit();
         selctedcountryname = sp.getString("selectedcountryname", "");
-        Log.d("country", "33333333333330" + selctedcountryname);
+        userid=sp.getInt("id",0);
+        Log.d("country", "id" + userid);
 
         organizationListSpinner = (Spinner) findViewById(R.id.organizationListSpinner);
 
@@ -127,16 +133,23 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     public void addingjsonvalues() {
         ComplaintHeadString = home_complaintHeadET.getText().toString();
         ComplaintString = home_complaintET.getText().toString();
+
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("status", "complaint");
             jsonObject.put("header", ComplaintHeadString);
             jsonObject.put("complaint", ComplaintString);
+            jsonObject.put("userid",userid);
             jsonObject.put("organization", OrganizationString);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        complaint_webservice.execute(jsonObject.toString());
+        if ( ComplaintString!= null && ComplaintString.length() > 0 ) {
+            complaint_webservice.execute(jsonObject.toString());
+        }
+        else{
+            Toast.makeText(getApplicationContext(),"enter valid data",Toast.LENGTH_LONG).show();
+        }
     }
 
 //////////////////////////////////////////////////////////////////
@@ -148,7 +161,14 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pg.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected Void doInBackground(String... strings) {
+
             Log.d("jobin", "selected country in the fetch organization class is " + strings[0]);
             String result = servicehandler.makeServiceCall(url, strings[0]);
             Log.d("jobin", "result given from the makeservicecall is: " + result);
@@ -190,7 +210,8 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
             organizationListSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     OrganizationString = organization_list.get(position).toString();
-                    Toast.makeText(getApplicationContext(), OrganizationString, Toast.LENGTH_LONG).show();
+
+                    pg.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -212,6 +233,12 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
         protected String doInBackground(String... strings) {
             Log.d("json", "11111111" + strings[0]);
             String result = servicehandler.makeServiceCall(complaint_url, strings[0], 0);
@@ -224,6 +251,10 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Log.d("rajeev", "111111111" + s);
+            Toast.makeText(getApplicationContext(), "complaint submitted", Toast.LENGTH_LONG).show();
+            RetrieveFeedTask obj= new RetrieveFeedTask();
+            obj.execute("");
+
 
         }
     }
@@ -232,6 +263,7 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
 
     public void opencamera()
     {
+        count=count+1;
         Log.d("jobin", "in the open camera function");
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);// declare the intent for camera
         fileUri = getOutputMediaFileUri();// this function call will eventually return the name to be assigned for the photo
@@ -258,9 +290,9 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
 
 
 
-            String demo=compressImage(fileUri.getPath());
+         //   String demo=compressImage(fileUri.getPath());
 
-            Log.d("jobin", "result demo string: " +demo);
+         //   Log.d("jobin", "result demo string: " +demo);
 
 	/*     listOfImages.add(demo);
 	     ListImage adapter = new ListImage(Comp.this,listOfImages);
@@ -275,18 +307,26 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
             // images
             options.inSampleSize = 1;
 
-            Bitmap bitmap = BitmapFactory.decodeFile(fileUri.getPath(),options);
+            Bitmap bitmap = BitmapFactory.decodeFile(compressImage(fileUri.getPath()),options);
 
 
 
             Log.d("jobin", "setting bitmap");
 
            // Bitmap bp = (Bitmap) data.getExtras().get("data");
+        if(count==1){
             home_compalintImg3.setImageBitmap(bitmap);
+            return;
+        }
+           else if(count==2){
             home_compalintImg2.setImageBitmap(bitmap);
+            return;
+        }
+
+          else{
             home_compalintImg1.setImageBitmap(bitmap);
-          //  RetrieveFeedTask obj= new RetrieveFeedTask();
-           // obj.execute("");
+        }
+
 
         }
 
@@ -469,7 +509,7 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
             String responseFromServer = "";
-            String urlString = "http://10.0.0.117:80/complaintlogger/uploadimage.php";
+            String urlString = "http://10.0.0.128/complaintlogger/uploadimage.php";
             Log.d("jobin", "3");
             try {
 
@@ -548,6 +588,9 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
             } catch (IOException ioex) {
                 Log.e("Debug", "error: " + ioex.getMessage(), ioex);
             }
+
+            Intent i=new Intent(Home.this,Home.class);
+            startActivity(i);
             return null;
         }
     }
