@@ -47,11 +47,47 @@ public class Splash_screen extends Activity {
         ConnectivityManager connect = null;
         connect = (ConnectivityManager) this.getSystemService(this.CONNECTIVITY_SERVICE);
 
+
         if (connect != null) {
-            NetworkInfo result = connect.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-            if (result != null && result.isConnectedOrConnecting())
-            {
-                Toast.makeText(getApplicationContext(), "network  available", Toast.LENGTH_LONG).show();
+            NetworkInfo result = (connect.getNetworkInfo(ConnectivityManager.TYPE_MOBILE));
+            if (result != null && result.isConnectedOrConnecting()) {
+                Toast.makeText(getApplicationContext(), "Mobile network  available", Toast.LENGTH_LONG).show();
+
+                //for initializing the chk value to true for first run
+                sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
+                editor = sp.edit();
+                chk = sp.getBoolean("firstlogin", true);
+
+
+                //Thread for creating the delay for splash screen
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // TODO Auto-generated method stub
+                        if (chk) {
+
+
+                            //	editor.putBoolean("isonetime",false);
+                            //	editor.commit();
+                            Log.d("tag", "boolean" + chk);
+
+                            Login l = new Login(sp, editor);
+                            Intent i = new Intent(Splash_screen.this, Login.class); // has to corrected as intent to home.class pn completion of test
+                            startActivity(i);
+                            finish();
+                        } else {
+
+                            Intent i = new Intent(Splash_screen.this, Home.class); // has to corrected as intent to home.class pn completion of test
+                            startActivity(i);
+                            finish();
+
+
+                        }
+                    }
+                }, SPLASH_TIME_OUT);
+
+
             }
             else {
                 result = connect.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -89,9 +125,6 @@ public class Splash_screen extends Activity {
                                 finish();
 
 
-
-
-
                             }
                         }
                     }, SPLASH_TIME_OUT);
@@ -107,7 +140,9 @@ public class Splash_screen extends Activity {
                     }, SPLASH_TIME_OUT);
                 }
             }
-        } else {
+        }
+
+        else {
             Toast.makeText(getApplicationContext(), "network not available", Toast.LENGTH_LONG).show();
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -121,7 +156,6 @@ public class Splash_screen extends Activity {
 
 
     }
-
 
 
 }
