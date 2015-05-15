@@ -32,7 +32,7 @@ public class Splash_screen extends Activity {
     SharedPreferences.Editor editor;
     Servicehandler servicehandler = new Servicehandler();
 
-    static String url = "http://10.0.0.128/complaintlogger/fetchorglist.php";
+  //  static String url = "http://10.0.0.128/complaintlogger/fetchorglist.php";
     ArrayList<String> oganization_list = new ArrayList<String>(); //**** list to populate the spinner****//
 
 

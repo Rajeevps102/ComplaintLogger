@@ -66,9 +66,15 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
 ProgressBar pg;
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
-    static String url = "http://10.0.0.128/complaintlogger/fetchorg.php";
-    static String complaint_url = "http://10.0.0.128/complaintlogger/complaints.php";
+    static String url = "http://10.0.0.127/complaintlogger/fetchorg.php";
+    static String complaint_url = "http://10.0.0.127/complaintlogger/complaints.php";
     private Uri fileUri;
+    ArrayList<String> organization_list = new ArrayList<String>(); //**** list to populate the spinner****//
+    Fetchorganization fetchorg = new Fetchorganization();
+    EditText home_complaintHeadET, home_complaintET; // edit text that receive complaint subject and complaint
+    Button submit;
+    String ComplaintHeadString, ComplaintString, OrganizationString; //string that store complaint subject  complaint, and organization name that is selected from spinner
+
     /*The home class is loaded on successful user verification at the login process. the Home class
      displays options to
       1. choose an organization by fetching from the database
@@ -80,16 +86,12 @@ ProgressBar pg;
       5. submit button*/
 
 
-    ArrayList<String> organization_list = new ArrayList<String>(); //**** list to populate the spinner****//
-    Fetchorganization fetchorg = new Fetchorganization();
+
 
     public Home() {
 
     }
 
-    EditText home_complaintHeadET, home_complaintET; // edit text that receive complaint subject and complaint
-    Button submit;
-    String ComplaintHeadString, ComplaintString, OrganizationString; //string that store complaint subject  complaint, and organization name that is selected from spinner
 
 
     @Override
@@ -514,7 +516,7 @@ ProgressBar pg;
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
             String responseFromServer = "";
-            String urlString = "http://10.0.0.128/complaintlogger/uploadimage.php";
+            String urlString = "http://10.0.0.127/complaintlogger/uploadimage.php";
             Log.d("jobin", "3");
             try {
 
@@ -594,7 +596,7 @@ ProgressBar pg;
                 Log.e("Debug", "error: " + ioex.getMessage(), ioex);
             }
 
-            Intent i=new Intent(Home.this,Home.class);
+            Intent i=new Intent(Home.this,StatusViewer.class);
             startActivity(i);
             return null;
         }
