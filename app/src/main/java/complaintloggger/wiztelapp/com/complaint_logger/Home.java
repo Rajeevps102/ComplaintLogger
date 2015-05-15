@@ -165,6 +165,7 @@ ProgressBar pg;
         protected void onPreExecute() {
             super.onPreExecute();
             pg.setVisibility(View.VISIBLE);
+
         }
 
         @Override
@@ -254,9 +255,11 @@ ProgressBar pg;
             Log.d("rajeev", "111111111" + s);
             Toast.makeText(getApplicationContext(), "complaint submitted", Toast.LENGTH_LONG).show();
 
-            for(Integer i=0;i<camera_image_path.size();i++) {
-                RetrieveFeedTask obj = new RetrieveFeedTask();
-                obj.execute(camera_image_path.get(i));
+            if(camera_image_path.size()!=0) {
+                for (Integer i = 0; i < camera_image_path.size(); i++) {
+                    RetrieveFeedTask obj = new RetrieveFeedTask();
+                    obj.execute(camera_image_path.get(i));
+                }
             }
 
         }
