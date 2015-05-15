@@ -62,6 +62,7 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     public Integer count=0;
     static String dirname = "ComplaintLogger";
     ImageView camera, attach;
+    ArrayList<String>camera_image_path=new ArrayList<>();
 ProgressBar pg;
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
@@ -152,7 +153,7 @@ ProgressBar pg;
         }
     }
 
-//////////////////////////////////////////////////////////////////
+////////////////////getting organization names from server//////////////////////////////////////////////
 
     public class Fetchorganization extends AsyncTask<String, Void, Void> {
 
@@ -252,9 +253,11 @@ ProgressBar pg;
             super.onPostExecute(s);
             Log.d("rajeev", "111111111" + s);
             Toast.makeText(getApplicationContext(), "complaint submitted", Toast.LENGTH_LONG).show();
-            RetrieveFeedTask obj= new RetrieveFeedTask();
-            obj.execute("");
 
+            for(Integer i=0;i<camera_image_path.size();i++) {
+                RetrieveFeedTask obj = new RetrieveFeedTask();
+                obj.execute(camera_image_path.get(i));
+            }
 
         }
     }
@@ -290,7 +293,7 @@ ProgressBar pg;
 
 
 
-         //   String demo=compressImage(fileUri.getPath());
+           camera_image_path.add(compressImage(fileUri.getPath()));
 
          //   Log.d("jobin", "result demo string: " +demo);
 
@@ -331,6 +334,7 @@ ProgressBar pg;
         }
 
     }
+    // compressing the image from camera//
 
     public String compressImage(String imageUri) {
 
@@ -436,7 +440,7 @@ ProgressBar pg;
 
 
 
-
+// creating a file path for saving the photos//
 
 
     public Uri getOutputMediaFileUri()
@@ -488,6 +492,7 @@ ProgressBar pg;
 
         return inSampleSize;
     }
+    // class to upload image to the server//
 
     class RetrieveFeedTask extends AsyncTask<String, Void, Void> {
 
@@ -500,7 +505,7 @@ ProgressBar pg;
 			/*	String existingFileName = Environment.getExternalStorageDirectory()
 						.getAbsolutePath() + "/DCIM/a.png";
 						*/
-            String existingFileName =compressImage(fileUri.getPath());
+            String existingFileName =params[0];
             Log.d("jobin", existingFileName);
             String lineEnd = "\r\n";
             String twoHyphens = "--";
