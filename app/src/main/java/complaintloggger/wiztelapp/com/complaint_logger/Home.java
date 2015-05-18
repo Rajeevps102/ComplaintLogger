@@ -60,14 +60,15 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     ImageView home_compalintImg3,home_compalintImg2,home_compalintImg1;
     String loc;
     public Integer count=0;
+    public Integer complaint_id;
     static String dirname = "ComplaintLogger";
     ImageView camera, attach;
     ArrayList<String>camera_image_path=new ArrayList<>();
 ProgressBar pg;
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
-    static String url = "http://10.0.0.127/complaintlogger/fetchorg.php";
-    static String complaint_url = "http://10.0.0.127/complaintlogger/complaints.php";
+    static String url = "http://10.0.0.118/complaintlogger/fetchorg.php";
+    static String complaint_url = "http://10.0.0.118/complaintlogger/complaints.php";
     private Uri fileUri;
     ArrayList<String> organization_list = new ArrayList<String>(); //**** list to populate the spinner****//
     Fetchorganization fetchorg = new Fetchorganization();
@@ -255,13 +256,24 @@ ProgressBar pg;
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Log.d("rajeev", "111111111" + s);
-            Toast.makeText(getApplicationContext(), "complaint submitted", Toast.LENGTH_LONG).show();
+            try {
+                JSONObject j = new JSONObject(s);
+                complaint_id=j.getInt("complaintid");
+            }
+            catch (JSONException e){
+                e.printStackTrace();
+            }
+            Toast.makeText(getApplicationContext(), "complaint submitted"+""+complaint_id, Toast.LENGTH_LONG).show();
 
             if(camera_image_path.size()!=0) {
                 for (Integer i = 0; i < camera_image_path.size(); i++) {
                     RetrieveFeedTask obj = new RetrieveFeedTask();
                     obj.execute(camera_image_path.get(i));
                 }
+            }
+            else{
+                Intent i=new Intent(Home.this,StatusViewer.class);
+                startActivity(i);
             }
 
         }
@@ -519,7 +531,7 @@ ProgressBar pg;
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
             String responseFromServer = "";
-            String urlString = "http://10.0.0.127/complaintlogger/uploadimage.php";
+            String urlString = "http://10.0.0.118/complaintlogger/uploadimage.php";
             Log.d("jobin", "3");
             try {
 

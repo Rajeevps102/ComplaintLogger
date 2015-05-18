@@ -287,6 +287,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
         return response;
     }
+// to save the complaint//
 
     public String makeServiceCall(String url1, String json,Integer i) {
 
@@ -345,5 +346,73 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
         return response;
 
+    }
+
+    // for getting the complaint details//
+
+
+    public String  makeServiceCall(Integer i){
+        Log.d("rajeev","inside make"+i);
+        String url="http://10.0.0.118/complaintlogger/viewstatus.php";
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("userid", i);
+        }
+        catch (JSONException e){
+            e.printStackTrace();
+        }
+
+        try {
+
+
+
+            URL Url = new URL(url);
+            urlConnection = (HttpURLConnection) Url.openConnection();
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+
+            urlConnection.setRequestProperty("Accept", "application/json");
+
+            urlConnection.setRequestMethod("POST");
+            urlConnection.connect();
+            OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
+            wr.write(jsonObject.toString());
+            wr.flush();
+            wr.close();
+            int HttpResult =urlConnection.getResponseCode();
+            if(HttpResult ==HttpURLConnection.HTTP_OK) {
+                InputStream in = urlConnection.getInputStream();
+                Log.d("jobin", "inputstream recieved" + urlConnection.getInputStream());
+                // InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                // BufferedReader reader=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                response = reader.readLine();
+                Log.d("jobin", "response is:  " + response);
+
+
+                is.close();
+
+
+            }
+
+        }
+
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            Log.e("Buffer Error", "Error: " + e.toString());
+        }
+        finally {
+            urlConnection.disconnect();
+        }
+
+        return response;
     }
 }
