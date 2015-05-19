@@ -15,8 +15,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -74,6 +76,7 @@ ProgressBar pg;
     Fetchorganization fetchorg = new Fetchorganization();
     EditText home_complaintHeadET, home_complaintET; // edit text that receive complaint subject and complaint
     Button submit;
+    Toolbar toolbar;
     String ComplaintHeadString, ComplaintString, OrganizationString; //string that store complaint subject  complaint, and organization name that is selected from spinner
 
     /*The home class is loaded on successful user verification at the login process. the Home class
@@ -102,6 +105,8 @@ ProgressBar pg;
 
         home_complaintHeadET = (EditText) findViewById(R.id.home_complaintHeadET);
         home_complaintET = (EditText) findViewById(R.id.home_complaintET);
+        initToolbars();
+
         submit = (Button) findViewById(R.id.home_submitBtn);
         pg=(ProgressBar)findViewById(R.id.pbHeaderProgress);
         pg.setVisibility(View.GONE);
@@ -114,6 +119,7 @@ ProgressBar pg;
 
         organizationListSpinner = (Spinner) findViewById(R.id.organizationListSpinner);
 
+
         fetchorg.execute(selctedcountryname);
         home_compalintImg1=(ImageView)findViewById(R.id.home_compalintImg1);
         home_compalintImg2=(ImageView)findViewById(R.id.home_compalintImg2);
@@ -121,7 +127,44 @@ ProgressBar pg;
         camera=(ImageView )findViewById(R.id.home_camera);
         attach=(ImageView)findViewById(R.id.home_attach);
         camera.setOnClickListener(this);
+        attach.setOnClickListener(this);
 
+    }
+
+    private void initToolbars() {
+
+
+
+        Toolbar toolbarBottom = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbarBottom.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch(item.getItemId()){
+                    case R.id.action_settings:
+                        Intent i=new Intent(Home.this,StatusViewer.class);
+                        startActivity(i);
+                        finish();
+
+                        break;
+                    // TODO: Other cases
+                }
+                return true;
+            }
+        });
+        // Inflate a menu to be displayed in the toolbar
+        toolbarBottom.inflateMenu(R.menu.menu_splash_screen);
+    }
+
+
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        home_complaintHeadET.setText("");
+        home_complaintET.setText("");
     }
 
     @Override
@@ -130,6 +173,12 @@ ProgressBar pg;
             case R.id.home_submitBtn: addingjsonvalues() ;
                 break;
             case R.id.home_camera:opencamera();
+                break;
+            case R.id.home_attach:
+                Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+// Start the Intent
+                startActivityForResult(galleryIntent,3);
                 break;
         }
     }
@@ -296,7 +345,7 @@ ProgressBar pg;
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // TODO Auto-generated method stub
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("jobin", "data recieved is "+data);
+        Log.d("jobin", "data recieved is " + data);
 
 
     if(resultCode==0)
@@ -335,7 +384,7 @@ ProgressBar pg;
 
            // Bitmap bp = (Bitmap) data.getExtras().get("data");
         if(count==1){
-            home_compalintImg3.setImageBitmap(bitmap);
+            home_compalintImg1.setImageBitmap(bitmap);
             return;
         }
            else if(count==2){
@@ -344,11 +393,25 @@ ProgressBar pg;
         }
 
           else{
-            home_compalintImg1.setImageBitmap(bitmap);
+            home_compalintImg3.setImageBitmap(bitmap);
+
         }
 
 
         }
+        else if(requestCode==3){
+        Uri photoUri = data.getData();
+        Log.d("rajeev","data"+photoUri);
+        try {
+
+            Bitmap b = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
+            home_compalintImg1.setImageBitmap(b);
+            Log.d("rajeev","data"+photoUri);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
     }
     // compressing the image from camera//
@@ -613,6 +676,7 @@ ProgressBar pg;
 
             Intent i=new Intent(Home.this,StatusViewer.class);
             startActivity(i);
+            finish();
             return null;
         }
     }

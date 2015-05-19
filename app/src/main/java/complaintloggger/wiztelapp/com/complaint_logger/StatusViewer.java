@@ -3,6 +3,7 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -57,32 +58,42 @@ complaint_details.execute(userid);
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-      final   AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
-        alertDialogBuilder.setMessage("rajeev");
-        alertDialogBuilder.setPositiveButton("yes",
-                new DialogInterface.OnClickListener() {
+      //  super.onBackPressed();
 
-                    @Override
-                    public void onClick(DialogInterface arg0, int arg1) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(StatusViewer.this);
 
 
-                        Toast.makeText(getApplicationContext(),"clicked",Toast.LENGTH_LONG).show();
-                    }
-                });
-        alertDialogBuilder.setNegativeButton("raju",
-                new DialogInterface.OnClickListener() {
+        builder.setTitle("Confirm");
+        builder.setMessage("Are you sure?");
 
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing but close the dialog
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
+                startActivity(intent);
+                finish();
+                System.exit(0);
+            }
 
-                        Toast.makeText(getApplicationContext(),"clicked",Toast.LENGTH_LONG).show();
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+        });
 
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing
+
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+      //  Intent i=new Intent(StatusViewer.this,StatusViewer.class);
+       // startActivity(i);
     }
 
 
