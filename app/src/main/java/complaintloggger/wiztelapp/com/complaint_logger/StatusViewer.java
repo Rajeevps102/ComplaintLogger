@@ -70,11 +70,11 @@ complaint_details.execute(userid);
 
             public void onClick(DialogInterface dialog, int which) {
                 // Do nothing but close the dialog
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_HOME);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
-                startActivity(intent);
-                finish();
+              //  Intent intent = new Intent(Intent.ACTION_MAIN);
+              //  intent.addCategory(Intent.CATEGORY_HOME);
+             //   intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
+             //   startActivity(intent);
+              //  finish();
                 System.exit(0);
             }
 
