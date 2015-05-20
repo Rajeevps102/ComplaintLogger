@@ -3,6 +3,7 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -61,6 +62,9 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     public static String timeStamp;
     ImageView home_compalintImg3,home_compalintImg2,home_compalintImg1;
     String loc;
+    String picturePath; // used in attachment
+    Bitmap bitmap;
+    public Integer attach_count=0;
     public Integer count=0;
     public Integer complaint_id;
     static String dirname = "ComplaintLogger";
@@ -156,8 +160,9 @@ ProgressBar pg;
     @Override
     protected void onResume() {
         super.onResume();
-        home_complaintHeadET.setText("");
-        home_complaintET.setText("");
+       // home_complaintHeadET.setText("");
+       // home_complaintET.setText("");
+      //  camera_image_path.clear();
     }
 
     @Override
@@ -170,7 +175,8 @@ ProgressBar pg;
             case R.id.home_attach:
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-// Start the Intent
+                        attach_count=attach_count+1;
+                count=count+1;
                 startActivityForResult(galleryIntent,3);
                 break;
         }
@@ -326,11 +332,12 @@ ProgressBar pg;
     public void opencamera()
     {
         count=count+1;
-        Log.d("jobin", "in the open camera function");
+        attach_count=attach_count+1;
+        Log.d("jobin", "in the open camera function"+count);
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);// declare the intent for camera
-        fileUri = getOutputMediaFileUri();// this function call will eventually return the name to be assigned for the photo
-       Log.d("jobin", "fileuri recieved is "+fileUri);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);// adds name as PutExtra feature
+      //  fileUri = getOutputMediaFileUri();// this function call will eventually return the name to be assigned for the photo
+     //  Log.d("jobin", "fileuri recieved is "+fileUri);
+     //   intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);// adds name as PutExtra feature
         startActivityForResult(intent, 1);// starts the intent to camera
 
     }
@@ -351,28 +358,42 @@ ProgressBar pg;
      else   if(requestCode==1)  {
 
 
+        Uri photoUri = data.getData();
+        String[] projection = {MediaStore.Images.Media.DATA};
+        try {
+            Cursor cursor = getContentResolver().query(photoUri, projection, null, null, null);
+            cursor.moveToFirst();
 
-           camera_image_path.add(compressImage(fileUri.getPath()));
+            int columnIndex = cursor.getColumnIndex(projection[0]);
+            picturePath = cursor.getString(columnIndex);
+            camera_image_path.add(compressImage(picturePath));
+            cursor.close();
+            Log.d("Picture Path", picturePath);
+        }
+        catch(Exception e) {
+            Log.e("Path Error", e.toString());
+        }
 
-         //   Log.d("jobin", "result demo string: " +demo);
-
-	/*     listOfImages.add(demo);
-	     ListImage adapter = new ListImage(Comp.this,listOfImages);
-	     lv.setAdapter(adapter);   */
-
-            // to compress the image file
+        //   camera_image_path.add(compressImage(fileUri.getPath()));
 
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
+
+
 
             // downsizing image as it throws OutOfMemory Exception for larger
             // images
-            options.inSampleSize = 1;
 
-            Bitmap bitmap = BitmapFactory.decodeFile(compressImage(fileUri.getPath()),options);
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 5;
+          //   bitmap =MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);// BitmapFactory.decodeFile(picturePath,options);
+                bitmap=BitmapFactory.decodeFile(picturePath,options);
+           // Bitmap b = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
 
-
-
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
             Log.d("jobin", "setting bitmap");
 
            // Bitmap bp = (Bitmap) data.getExtras().get("data");
@@ -382,11 +403,14 @@ ProgressBar pg;
         }
            else if(count==2){
             home_compalintImg2.setImageBitmap(bitmap);
+            Log.d("rajeev","1111111111111111111111111111111111111");
             return;
         }
 
-          else{
+        else if(count==3){
+            Log.d("rajeev","1111111111111111111111111111111111111");
             home_compalintImg3.setImageBitmap(bitmap);
+            return;
 
         }
 
@@ -394,12 +418,39 @@ ProgressBar pg;
         }
         else if(requestCode==3){
         Uri photoUri = data.getData();
+        String[] projection = {MediaStore.Images.Media.DATA};
+        try {
+            Cursor cursor = getContentResolver().query(photoUri, projection, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(projection[0]);
+             picturePath = cursor.getString(columnIndex);
+            camera_image_path.add(compressImage(picturePath));
+            cursor.close();
+            Log.d("Picture Path", picturePath);
+        }
+        catch(Exception e) {
+            Log.e("Path Error", e.toString());
+        }
         Log.d("rajeev","data"+photoUri);
         try {
+            BitmapFactory.Options opt = new BitmapFactory.Options();
+            opt.inSampleSize=5;
+            Bitmap b = BitmapFactory.decodeFile(picturePath,opt);
+         //   Bitmap b = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
 
-            Bitmap b = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
-            home_compalintImg1.setImageBitmap(b);
-            Log.d("rajeev","data"+photoUri);
+            if(attach_count==1) {
+
+                home_compalintImg1.setImageBitmap(b);
+                Log.d("rajeev", "data" + MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri));
+            }
+          else if(attach_count==2){
+                home_compalintImg2.setImageBitmap(b);
+            }
+            else if(attach_count==3){
+                home_compalintImg3.setImageBitmap(b);
+                return;
+            }
         }
         catch(Exception e){
             e.printStackTrace();
