@@ -64,6 +64,7 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     String loc;
     String picturePath; // used in attachment
     Bitmap bitmap;
+    Uri photoUri;
     public Integer attach_count=0;
     public Integer count=0;
     public Integer complaint_id;
@@ -81,6 +82,7 @@ ProgressBar pg;
     EditText home_complaintHeadET, home_complaintET; // edit text that receive complaint subject and complaint
     Button submit;
     Toolbar toolbar;
+
     String ComplaintHeadString, ComplaintString, OrganizationString; //string that store complaint subject  complaint, and organization name that is selected from spinner
 
     /*The home class is loaded on successful user verification at the login process. the Home class
@@ -133,6 +135,7 @@ ProgressBar pg;
         camera.setOnClickListener(this);
         attach.setOnClickListener(this);
 
+
     }
 
     private void initToolbars() {
@@ -165,10 +168,10 @@ ProgressBar pg;
 
 
     @Override
-    protected void onResume() {
+    protected void onDestroy() {
         super.onResume();
-       // home_complaintHeadET.setText("");
-       // home_complaintET.setText("");
+      //  home_complaintHeadET.setText("");
+      //  home_complaintET.setText("");
       //  camera_image_path.clear();
     }
 
@@ -177,13 +180,13 @@ ProgressBar pg;
         switch (view.getId()) {
             case R.id.home_submitBtn: addingjsonvalues() ;
                 break;
-            case R.id.home_camera:opencamera();
+            case R.id.home_camera:
+               opencamera();
                 break;
             case R.id.home_attach:
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        attach_count=attach_count+1;
-                count=count+1;
+
                 startActivityForResult(galleryIntent,3);
                 break;
         }
@@ -295,7 +298,7 @@ ProgressBar pg;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
+submit.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -327,6 +330,8 @@ ProgressBar pg;
                 }
             }
             else{
+                home_complaintHeadET.setText("");
+                home_complaintET.setText("");
                 Intent i=new Intent(Home.this,StatusViewer.class);
                 startActivity(i);
             }
@@ -338,8 +343,7 @@ ProgressBar pg;
 
     public void opencamera()
     {
-        count=count+1;
-        attach_count=attach_count+1;
+
         Log.d("jobin", "in the open camera function"+count);
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);// declare the intent for camera
       //  fileUri = getOutputMediaFileUri();// this function call will eventually return the name to be assigned for the photo
@@ -351,7 +355,7 @@ ProgressBar pg;
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // TODO Auto-generated method stub
-        super.onActivityResult(requestCode, resultCode, data);
+     //   super.onActivityResult(requestCode, resultCode, data);
         Log.d("jobin", "data recieved is " + data);
 
 
@@ -362,19 +366,21 @@ ProgressBar pg;
     }
 
 
+
      else   if(requestCode==1)  {
 
-
-        Uri photoUri = data.getData();
-        String[] projection = {MediaStore.Images.Media.DATA};
+        count=count+1;
+        attach_count=attach_count+1;
+         photoUri = data.getData();
+        String[] projection1 = {MediaStore.Images.Media.DATA};
         try {
-            Cursor cursor = getContentResolver().query(photoUri, projection, null, null, null);
-            cursor.moveToFirst();
+            Cursor cursor1 = getContentResolver().query(photoUri, projection1, null, null, null);
+            cursor1.moveToFirst();
 
-            int columnIndex = cursor.getColumnIndex(projection[0]);
-            picturePath = cursor.getString(columnIndex);
+            int columnIndex1 = cursor1.getColumnIndex(projection1[0]);
+            picturePath = cursor1.getString(columnIndex1);
             camera_image_path.add(compressImage(picturePath));
-            cursor.close();
+            cursor1.close();
             Log.d("Picture Path", picturePath);
         }
         catch(Exception e) {
@@ -394,16 +400,17 @@ ProgressBar pg;
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 5;
           //   bitmap =MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);// BitmapFactory.decodeFile(picturePath,options);
-                bitmap=BitmapFactory.decodeFile(picturePath,options);
-           // Bitmap b = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
+            //   bitmap=BitmapFactory.decodeFile(picturePath,options);
 
+           // Bitmap b = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
+              bitmap  = (Bitmap) data.getExtras().get("data");
         }
         catch(Exception e){
             e.printStackTrace();
         }
             Log.d("jobin", "setting bitmap");
 
-           // Bitmap bp = (Bitmap) data.getExtras().get("data");
+
         if(count==1){
             home_compalintImg1.setImageBitmap(bitmap);
             return;
@@ -417,14 +424,20 @@ ProgressBar pg;
         else if(count==3){
             Log.d("rajeev","1111111111111111111111111111111111111");
             home_compalintImg3.setImageBitmap(bitmap);
+            camera.setVisibility(View.INVISIBLE);
+            attach.setVisibility(View.INVISIBLE);
             return;
 
         }
 
 
+            ;
+
         }
         else if(requestCode==3){
-        Uri photoUri = data.getData();
+        attach_count=attach_count+1;
+        count=count+1;
+         photoUri = data.getData();
         String[] projection = {MediaStore.Images.Media.DATA};
         try {
             Cursor cursor = getContentResolver().query(photoUri, projection, null, null, null);
@@ -456,6 +469,8 @@ ProgressBar pg;
             }
             else if(attach_count==3){
                 home_compalintImg3.setImageBitmap(b);
+                camera.setVisibility(View.INVISIBLE);
+                attach.setVisibility(View.INVISIBLE);
                 return;
             }
         }
@@ -732,4 +747,15 @@ ProgressBar pg;
         }
     }
 
+
+
+    // to clear the cache
+
+
+
 }
+
+
+
+
+

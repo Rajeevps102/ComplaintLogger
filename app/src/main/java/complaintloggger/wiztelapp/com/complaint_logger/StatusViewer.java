@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 /**
  * Created by dep2 on 5/15/2015.
  */
-public class StatusViewer extends ActionBarActivity {
+public class StatusViewer extends ActionBarActivity implements AdapterView.OnItemClickListener {
 
     ListView status_listview;
     ArrayList<String>complaint_head=new ArrayList<String>();
@@ -37,6 +38,7 @@ public class StatusViewer extends ActionBarActivity {
     SharedPreferences sp;
     SharedPreferences.Editor editor;
 public  Integer userid;
+    public  final Integer RESULT_CLOSE_ALL=1;
     Complaint_details complaint_details=new Complaint_details();
     Servicehandler servicehandler=new Servicehandler();
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,10 @@ complaint_details.execute(userid);
         complaint_id.add(1);
         complaint_status.add("processing");  */
       //  status_listview.setAdapter(new Base(con, complaint_id, complaint_head, complaint_status));
+        status_listview.setOnItemClickListener(this);
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -69,18 +74,23 @@ complaint_details.execute(userid);
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
+             //   finish();
+             //   System.exit(1);
                 // Do nothing but close the dialog
-              //  Intent intent = new Intent(Intent.ACTION_MAIN);
-              //  intent.addCategory(Intent.CATEGORY_HOME);
-             //   intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
-             //   startActivity(intent);
-              //  finish();
+               Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
+             //   intent.putExtra("EXIT", true);
+                startActivity(intent);
+                finish();
                 System.exit(0);
+
+
+
+
             }
 
-        });
-
-        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -97,7 +107,7 @@ complaint_details.execute(userid);
     }
 
 
-// to implement base adapter to show the complaint status//////
+    // to implement base adapter to show the complaint status//////
 
     private class Viewholder{
         TextView id;
@@ -208,4 +218,20 @@ public Complaint_details(){
         status_listview.setAdapter(new Base(con, complaint_id, complaint_head, complaint_status));
     }
 }
+
+    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        // TODO Auto-generated method stub
+
+        Toast.makeText(getApplicationContext(),"clicked",Toast.LENGTH_LONG).show();
+              //  String value=(String) arg0.getItemAtPosition(arg2);
+               // Log.d("tag", "clicked item"+value);
+              //  Intent i=new Intent(arg1.getContext(),.class);
+             //   i.putExtra("sectionname",value);
+               // startActivity(i);
+             //   finish();
+
+
+
+
+    }
 }
