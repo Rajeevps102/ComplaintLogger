@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -27,16 +28,18 @@ import java.util.ArrayList;
 /**
  * Created by dep2 on 5/15/2015.
  */
-public class StatusViewer extends ActionBarActivity {
+public class StatusViewer extends ActionBarActivity implements AdapterView.OnItemClickListener {
 
     ListView status_listview;
     ArrayList<String>complaint_head=new ArrayList<String>();
     ArrayList<Integer>complaint_id=new ArrayList<Integer>();
     ArrayList<String>complaint_status=new ArrayList<String>();
+    ArrayList<String>jsonObjectArrayList=new ArrayList<>();
     Context con=this;
     SharedPreferences sp;
     SharedPreferences.Editor editor;
 public  Integer userid;
+    public  final Integer RESULT_CLOSE_ALL=1;
     Complaint_details complaint_details=new Complaint_details();
     Servicehandler servicehandler=new Servicehandler();
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +57,10 @@ complaint_details.execute(userid);
         complaint_id.add(1);
         complaint_status.add("processing");  */
       //  status_listview.setAdapter(new Base(con, complaint_id, complaint_head, complaint_status));
+        status_listview.setOnItemClickListener(this);
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -69,18 +75,23 @@ complaint_details.execute(userid);
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
+             //   finish();
+             //   System.exit(1);
                 // Do nothing but close the dialog
-              //  Intent intent = new Intent(Intent.ACTION_MAIN);
-              //  intent.addCategory(Intent.CATEGORY_HOME);
-             //   intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
-             //   startActivity(intent);
-              //  finish();
+               Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
+             //   intent.putExtra("EXIT", true);
+                startActivity(intent);
+                finish();
                 System.exit(0);
+
+
+
+
             }
 
-        });
-
-        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -97,7 +108,7 @@ complaint_details.execute(userid);
     }
 
 
-// to implement base adapter to show the complaint status//////
+    // to implement base adapter to show the complaint status//////
 
     private class Viewholder{
         TextView id;
@@ -197,6 +208,7 @@ public Complaint_details(){
             result=jsonObject.getJSONArray("result");
             for(Integer i=0;i<result.length();i++){
                 jobj=result.getJSONObject(i);
+                jsonObjectArrayList.add(jobj.toString());
                 complaint_head.add(jobj.getString("header"));
                 complaint_id.add(jobj.getInt("complaint_id"));
                 complaint_status.add(jobj.getString("description"));
@@ -208,4 +220,24 @@ public Complaint_details(){
         status_listview.setAdapter(new Base(con, complaint_id, complaint_head, complaint_status));
     }
 }
-}
+
+    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        // TODO Auto-generated method stub
+
+        Toast.makeText(getApplicationContext(), "You clicked on position : " + arg2 + " and id : " + arg3, Toast.LENGTH_LONG).show();
+       Integer i=complaint_id.get(arg2);
+        Toast.makeText(getApplicationContext(), "You clicked on position : " + i + " and id : " + i, Toast.LENGTH_LONG).show();
+
+        final Intent intent=new Intent(StatusViewer.this,Status_details.class);
+        intent.putExtra("complaint_id",i);
+        intent.putStringArrayListExtra("jsonarray",jsonObjectArrayList);
+        startActivity(intent);
+
+        }
+
+
+
+
+
+    }
+
