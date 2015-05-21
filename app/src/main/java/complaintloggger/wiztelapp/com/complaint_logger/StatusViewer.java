@@ -34,6 +34,7 @@ public class StatusViewer extends ActionBarActivity implements AdapterView.OnIte
     ArrayList<String>complaint_head=new ArrayList<String>();
     ArrayList<Integer>complaint_id=new ArrayList<Integer>();
     ArrayList<String>complaint_status=new ArrayList<String>();
+    ArrayList<String>jsonObjectArrayList=new ArrayList<>();
     Context con=this;
     SharedPreferences sp;
     SharedPreferences.Editor editor;
@@ -207,6 +208,7 @@ public Complaint_details(){
             result=jsonObject.getJSONArray("result");
             for(Integer i=0;i<result.length();i++){
                 jobj=result.getJSONObject(i);
+                jsonObjectArrayList.add(jobj.toString());
                 complaint_head.add(jobj.getString("header"));
                 complaint_id.add(jobj.getInt("complaint_id"));
                 complaint_status.add(jobj.getString("description"));
@@ -222,16 +224,20 @@ public Complaint_details(){
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
         // TODO Auto-generated method stub
 
-        Toast.makeText(getApplicationContext(),"clicked",Toast.LENGTH_LONG).show();
-              //  String value=(String) arg0.getItemAtPosition(arg2);
-               // Log.d("tag", "clicked item"+value);
-              //  Intent i=new Intent(arg1.getContext(),.class);
-             //   i.putExtra("sectionname",value);
-               // startActivity(i);
-             //   finish();
+        Toast.makeText(getApplicationContext(), "You clicked on position : " + arg2 + " and id : " + arg3, Toast.LENGTH_LONG).show();
+       Integer i=complaint_id.get(arg2);
+        Toast.makeText(getApplicationContext(), "You clicked on position : " + i + " and id : " + i, Toast.LENGTH_LONG).show();
+
+        final Intent intent=new Intent(StatusViewer.this,Status_details.class);
+        intent.putExtra("complaint_id",i);
+        intent.putStringArrayListExtra("jsonarray",jsonObjectArrayList);
+        startActivity(intent);
+
+        }
+
 
 
 
 
     }
-}
+
