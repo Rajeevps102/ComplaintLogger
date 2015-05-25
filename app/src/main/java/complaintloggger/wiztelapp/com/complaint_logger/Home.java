@@ -1,6 +1,9 @@
 package complaintloggger.wiztelapp.com.complaint_logger;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -41,6 +44,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -82,6 +86,7 @@ ProgressBar pg;
     EditText home_complaintHeadET, home_complaintET; // edit text that receive complaint subject and complaint
     Button submit;
     Toolbar toolbar;
+    JSONObject jsonObject;
 
     String ComplaintHeadString, ComplaintString, OrganizationString; //string that store complaint subject  complaint, and organization name that is selected from spinner
 
@@ -148,7 +153,7 @@ ProgressBar pg;
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch(item.getItemId()){
-                    case R.id.action_settings:
+                    case R.id.status:
                         Intent i=new Intent(Home.this,StatusViewer.class);
                         startActivity(i);
                         finish();
@@ -164,14 +169,65 @@ ProgressBar pg;
     }
 
 
+    @Override
+    public void onBackPressed() {
+        //  super.onBackPressed();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
+
+
+        builder.setTitle("Confirm");
+        builder.setMessage("Exit App?");
+
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                //   finish();
+                //   System.exit(1);
+                // Do nothing but close the dialog
+               Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
+             //   intent.putExtra("EXIT", true);
+                startActivity(intent);
+               finish();
+
+              //  int p = android.os.Process.myPid();
+               //  android.os.Process.killProcess(p);
+                System.exit(0);
+
+                //    Intent i=new Intent(StatusViewer.this,Home.class);
+                //     startActivity(i);
+
+
+            }
+
+        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing
+
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+        //  Intent i=new Intent(StatusViewer.this,StatusViewer.class);
+        // startActivity(i);
+    }
 
 
 
     @Override
     protected void onDestroy() {
-        super.onResume();
-      //  home_complaintHeadET.setText("");
-      //  home_complaintET.setText("");
+        super.onDestroy();
+       // System.exit(0);
+       //
+
+        home_complaintHeadET.setText("");
+       home_complaintET.setText("");
       //  camera_image_path.clear();
     }
 
@@ -203,6 +259,12 @@ ProgressBar pg;
             jsonObject.put("complaint", ComplaintString);
             jsonObject.put("userid",userid);
             jsonObject.put("organization", OrganizationString);
+        /*  for(Integer i=0;i<attach_count;i++) {
+              jsonObject.put("url"+i, camera_image_path.get(i));
+
+          }  */
+        //    jsonObject.put("count",attach_count);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -316,7 +378,7 @@ submit.setVisibility(View.INVISIBLE);
             Log.d("rajeev", "111111111" + s);
             try {
                 JSONObject j = new JSONObject(s);
-                complaint_id=j.getInt("complaintid");
+                complaint_id=j.getInt("complaint_id");
             }
             catch (JSONException e){
                 e.printStackTrace();
@@ -330,7 +392,7 @@ submit.setVisibility(View.INVISIBLE);
                 }
             }
             else{
-                home_complaintHeadET.setText("");
+               home_complaintHeadET.setText("");
                 home_complaintET.setText("");
                 Intent i=new Intent(Home.this,StatusViewer.class);
                 startActivity(i);
@@ -648,9 +710,11 @@ submit.setVisibility(View.INVISIBLE);
             Log.d("jobin", "2");
             DataOutputStream dos = null;
             DataInputStream inStream = null;
+            DataOutputStream dos_id=null;
 			/*	String existingFileName = Environment.getExternalStorageDirectory()
 						.getAbsolutePath() + "/DCIM/a.png";
 						*/
+
             String existingFileName =params[0];
             Log.d("jobin", existingFileName);
             String lineEnd = "\r\n";
@@ -681,13 +745,23 @@ submit.setVisibility(View.INVISIBLE);
                 Log.d("jobin", "4");
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Connection", "Keep-Alive");
+                conn.setRequestProperty("cookie",complaint_id.toString());
                 conn.setRequestProperty("Content-Type",
                         "multipart/form-data;boundary=" + boundary);
+
+               conn.connect();
                 dos = new DataOutputStream(conn.getOutputStream());
+
                 dos.writeBytes(twoHyphens + boundary + lineEnd);
-                dos.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\""
-                        + existingFileName + "\"" + lineEnd);
+                dos.writeBytes("Content-Disposition: form-data;  name=\"uploadedfile\";filename=\""
+                    + existingFileName + "\"" + lineEnd);
+
                 dos.writeBytes(lineEnd);
+
+
+
+
+
                 // create a buffer of maximum size
                 bytesAvailable = fileInputStream.available();
                 bufferSize = Math.min(bytesAvailable, maxBufferSize);
@@ -710,6 +784,7 @@ submit.setVisibility(View.INVISIBLE);
                 // close streams
                 Log.d("jobin", "6");
                 Log.e("Debug", "File is written");
+
                 fileInputStream.close();
                 dos.flush();
                 dos.close();
@@ -730,7 +805,7 @@ submit.setVisibility(View.INVISIBLE);
 
                 while ((str = inStream.readLine()) != null) {
 
-                    Log.e("Debug", "Server Response " + str);
+                    Log.e("response from net", "Server Response " + str);
 
                 }
 
@@ -743,7 +818,7 @@ submit.setVisibility(View.INVISIBLE);
             Intent i=new Intent(Home.this,StatusViewer.class);
             startActivity(i);
             finish();
-            return null;
+return null;
         }
     }
 

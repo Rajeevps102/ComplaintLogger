@@ -35,6 +35,7 @@ public class StatusViewer extends ActionBarActivity implements AdapterView.OnIte
     ArrayList<Integer>complaint_id=new ArrayList<Integer>();
     ArrayList<String>complaint_status=new ArrayList<String>();
     ArrayList<String>jsonObjectArrayList=new ArrayList<>();
+    ArrayList<Integer>id=new ArrayList<Integer>();
     Context con=this;
     SharedPreferences sp;
     SharedPreferences.Editor editor;
@@ -60,55 +61,14 @@ complaint_details.execute(userid);
         status_listview.setOnItemClickListener(this);
     }
 
-
-
     @Override
     public void onBackPressed() {
-      //  super.onBackPressed();
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(StatusViewer.this);
-
-
-        builder.setTitle("Confirm");
-        builder.setMessage("Are you sure?");
-
-        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int which) {
-             //   finish();
-             //   System.exit(1);
-                // Do nothing but close the dialog
-               Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_HOME);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//***Change Here***
-             //   intent.putExtra("EXIT", true);
-                startActivity(intent);
-                finish();
-                System.exit(0);
-
-
-
-
-            }
-
-        }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Do nothing
-
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog alert = builder.create();
-        alert.show();
-      //  Intent i=new Intent(StatusViewer.this,StatusViewer.class);
-       // startActivity(i);
+        super.onBackPressed();
+        Intent i=new Intent(StatusViewer.this,Home.class);
+            startActivity(i);
     }
 
-
-    // to implement base adapter to show the complaint status//////
+// to implement base adapter to show the complaint status//////
 
     private class Viewholder{
         TextView id;
@@ -212,6 +172,7 @@ public Complaint_details(){
                 complaint_head.add(jobj.getString("header"));
                 complaint_id.add(jobj.getInt("complaint_id"));
                 complaint_status.add(jobj.getString("description"));
+                id.add(jobj.getInt("id"));
             }
         }
         catch (JSONException e){
@@ -225,7 +186,7 @@ public Complaint_details(){
         // TODO Auto-generated method stub
 
         Toast.makeText(getApplicationContext(), "You clicked on position : " + arg2 + " and id : " + arg3, Toast.LENGTH_LONG).show();
-       Integer i=complaint_id.get(arg2);
+       Integer i=id.get(arg2);
         Toast.makeText(getApplicationContext(), "You clicked on position : " + i + " and id : " + i, Toast.LENGTH_LONG).show();
 
         final Intent intent=new Intent(StatusViewer.this,Status_details.class);
