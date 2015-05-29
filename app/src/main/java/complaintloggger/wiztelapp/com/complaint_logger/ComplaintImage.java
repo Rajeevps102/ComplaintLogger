@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import org.apache.http.client.ClientProtocolException;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 /**
  * Created by Raju on 25-05-2015.
  */
-public class ComplaintImage extends ActionBarActivity {
+public class ComplaintImage extends ActionBarActivity implements View.OnClickListener {
 
     Intent intent=new Intent();
     Integer id;
@@ -39,6 +40,8 @@ public class ComplaintImage extends ActionBarActivity {
     ImageView imageView1,imageView2,imageView3;
     ArrayList<String>pic_path=new ArrayList<>();
     Bitmap bitmap;
+    Bitmap bitmap2;
+    Bitmap bitmap3;
     Integer count=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +50,19 @@ public class ComplaintImage extends ActionBarActivity {
         imageView1=(ImageView)findViewById(R.id.compalint_Img1);
         imageView2=(ImageView)findViewById(R.id.compalint_Img2);
         imageView3=(ImageView)findViewById(R.id.compalint_Img3);
- intent=getIntent();
+        imageView1.setOnClickListener(this);
+        imageView2.setOnClickListener(this);
+        imageView3.setOnClickListener(this);
+         intent=getIntent();
         id=intent.getIntExtra("complaint_id", 0);
         Log.d("raju",""+id);
         fetchImage.execute(id);
     }
 
+    @Override
+    public void onClick(View view) {
+
+    }
 
 
     public class FetchImage extends AsyncTask<Integer, Void, Void>{
@@ -112,7 +122,6 @@ public class ComplaintImage extends ActionBarActivity {
                          pic_path.add(pic);
 
 
-
                     }
 
 in.close();
@@ -150,26 +159,33 @@ in.close();
             super.onPostExecute(aVoid);
 
             if(pic_path.size()!=0){
-                for(Integer i=0;i<pic_path.size();i++){
-                    count=count+1;
-                    displaypic.execute(pic_path.get(i));
-                }
+
+
+                    displaypic.execute(pic_path);
+
             }
         }
     }
 
 
-    public class Displaypic extends AsyncTask<String, Void, Void>{
+    public class Displaypic extends AsyncTask<ArrayList<String>, Void, Void>{
         public Displaypic() {
         }
 
+
+
         @Override
-        protected Void doInBackground(String... strings) {
-            Log.d("url","1111111111111111111111111111111111111111"+strings[0]);
+        protected Void doInBackground(ArrayList<String>... arrayLists) {
+            Log.d("url","1111111111111111111111111111111111111111"+arrayLists[0].get(0));
             try {
-                bitmap = BitmapFactory.decodeStream((InputStream) new URL(strings[0]).getContent());
+                bitmap = BitmapFactory.decodeStream((InputStream) new URL(arrayLists[0].get(0)).getContent());
+                bitmap2=BitmapFactory.decodeStream((InputStream) new URL(arrayLists[0].get(1)).getContent());
+                bitmap3=BitmapFactory.decodeStream((InputStream) new URL(arrayLists[0].get(2)).getContent());
                 Log.d("rajeev",""+bitmap);
-            }catch (Exception e) {
+            }catch (IndexOutOfBoundsException e){
+                e.printStackTrace();
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
@@ -181,13 +197,16 @@ in.close();
            // BitmapFactory.Options opt = new BitmapFactory.Options();
            // opt.inSampleSize = 5;
           //  Bitmap b = BitmapFactory.decodeFile(pic, opt);
-            if(count==1) {
+
                 imageView1.setImageBitmap(bitmap);
-               
-            }
-            else if(count==2){
-                imageView2.setImageBitmap(bitmap);
-            }
+
+
+
+                imageView2.setImageBitmap(bitmap2);
+
+
+            imageView3.setImageBitmap(bitmap3);
+
 
         }
 
