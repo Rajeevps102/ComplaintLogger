@@ -78,8 +78,8 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
 ProgressBar pg;
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
-    static String url = "http://10.0.0.118/complaintlogger/fetchorg.php";
-    static String complaint_url = "http://10.0.0.118/complaintlogger/complaints.php";
+    static String url = "http://10.0.0.130/complaintlogger/fetchorg.php";
+    static String complaint_url = "http://10.0.0.130/complaintlogger/complaints.php";
     private Uri fileUri;
     ArrayList<String> organization_list = new ArrayList<String>(); //**** list to populate the spinner****//
     Fetchorganization fetchorg = new Fetchorganization();
@@ -139,6 +139,9 @@ ProgressBar pg;
         attach=(ImageView)findViewById(R.id.home_attach);
         camera.setOnClickListener(this);
         attach.setOnClickListener(this);
+        home_compalintImg1.setOnClickListener(this);
+        home_compalintImg2.setOnClickListener(this);
+        home_compalintImg3.setOnClickListener(this);
 
 
     }
@@ -245,6 +248,35 @@ ProgressBar pg;
 
                 startActivityForResult(galleryIntent,3);
                 break;
+            case R.id.home_compalintImg1:
+                count=0;
+                attach_count=0;
+                    Intent intent1 = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                    startActivityForResult(intent1,3);
+                    break;
+
+            case R.id.home_compalintImg2:
+                count=1;
+                attach_count=1;
+                Intent intent2 = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                startActivityForResult(intent2,3);
+                break;
+
+            case R.id.home_compalintImg3:
+                count=2;
+                attach_count=2;
+                Intent intent3 = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                startActivityForResult(intent3,3);
+                break;
+
+
+
         }
     }
 
@@ -724,7 +756,7 @@ submit.setVisibility(View.INVISIBLE);
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
             String responseFromServer = "";
-            String urlString = "http://10.0.0.118/complaintlogger/uploadimage.php";
+            String urlString = "http://10.0.0.130/complaintlogger/uploadimage.php";
             Log.d("jobin", "3");
             try {
 

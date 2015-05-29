@@ -26,6 +26,7 @@
         <activity android:name=".Home"/>
         <activity android:name=".StatusViewer" />
         <activity android:name=".Status_details"/>
+        <activity android:name=".ComplaintImage"/>
     </application>
 
 </manifest>

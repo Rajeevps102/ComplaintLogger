@@ -51,7 +51,7 @@ public class Login extends Activity implements View.OnClickListener {
     SharedPreferences.Editor editor;
     Servicehandler servicehandler=new Servicehandler();
     Fetchspinner spn=new Fetchspinner();
-    static String url="http://10.0.0.118/complaintlogger/addcomplaint.php";
+    static String url="http://10.0.0.130/complaintlogger/addcomplaint.php";
     ArrayList<String> spinner_list=new ArrayList<String>(); //**** list to populate the spinner****//
 
     // to check mobile number and email pattern//
@@ -254,7 +254,7 @@ public class Login extends Activity implements View.OnClickListener {
             e.printStackTrace();
 
         }
-         String login_url="http://10.0.0.118/complaintlogger/login.php";
+         String login_url="http://10.0.0.130/complaintlogger/login.php";
         servicehandler=new Servicehandler(Login.this,jsonObject,login_interface);
 
           servicehandler.execute(login_url);
