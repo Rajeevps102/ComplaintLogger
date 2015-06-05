@@ -2,6 +2,7 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -57,6 +58,7 @@ import java.util.Locale;
  */
 public class Home extends ActionBarActivity implements View.OnClickListener {
 
+
     Servicehandler servicehandler = new Servicehandler();
     Spinner organizationListSpinner;
     SharedPreferences sp;
@@ -67,6 +69,7 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     ImageView home_compalintImg3,home_compalintImg2,home_compalintImg1;
     String loc;
     String picturePath; // used in attachment
+    String filename;// used in getoutputmedia
     Bitmap bitmap;
     Uri photoUri;
     public Integer attach_count=0;
@@ -76,8 +79,10 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     ImageView camera, attach;
     ArrayList<String>camera_image_path=new ArrayList<>();
 ProgressBar pg;
+    ProgressDialog progressDialog;
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
+
     static String url = "http://10.0.0.130/complaintlogger/fetchorg.php";
     static String complaint_url = "http://10.0.0.130/complaintlogger/complaints.php";
     private Uri fileUri;
@@ -122,6 +127,8 @@ ProgressBar pg;
         pg=(ProgressBar)findViewById(R.id.pbHeaderProgress);
         pg.setVisibility(View.GONE);
         submit.setOnClickListener(this);
+
+
         sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
         editor = sp.edit();
         selctedcountryname = sp.getString("selectedcountryname", "");
@@ -132,6 +139,8 @@ ProgressBar pg;
 
 
         fetchorg.execute(selctedcountryname);
+
+
         home_compalintImg1=(ImageView)findViewById(R.id.home_compalintImg1);
         home_compalintImg2=(ImageView)findViewById(R.id.home_compalintImg2);
         home_compalintImg3=(ImageView)findViewById(R.id.home_compalintImg3);
@@ -142,7 +151,7 @@ ProgressBar pg;
         home_compalintImg1.setOnClickListener(this);
         home_compalintImg2.setOnClickListener(this);
         home_compalintImg3.setOnClickListener(this);
-
+        home_complaintET.setOnClickListener(this);
 
     }
 
@@ -275,12 +284,20 @@ ProgressBar pg;
                 startActivityForResult(intent3,3);
                 break;
 
-
+            case R.id.home_complaintET:
+                home_complaintET.setError(null);
+                break;
 
         }
     }
 
     public void addingjsonvalues() {
+
+        if(OrganizationString==null){  // if server is down
+            Toast.makeText(getApplicationContext(),"Server is offline",Toast.LENGTH_LONG).show();
+            return;
+        }
+
         ComplaintHeadString = home_complaintHeadET.getText().toString();
         ComplaintString = home_complaintET.getText().toString();
 
@@ -305,6 +322,7 @@ ProgressBar pg;
         }
         else{
             Toast.makeText(getApplicationContext(),"enter valid data",Toast.LENGTH_LONG).show();
+            home_complaintET.setError("enter valid data");
         }
     }
 
@@ -333,8 +351,16 @@ ProgressBar pg;
             try {
                 JSONArray jsonArray = null;
                 JSONObject j = null;
-                JSONObject jsonObject = new JSONObject(result);
-                jsonArray = jsonObject.getJSONArray("organization");
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    jsonArray = jsonObject.getJSONArray("organization");
+                }catch (NullPointerException e){
+
+                    e.printStackTrace();
+                }
+                catch(JSONException e){
+                    e.printStackTrace();
+                }
 
                 for (Integer i = 0; i < jsonArray.length(); i++) {
                     j = jsonArray.getJSONObject(i);
@@ -351,6 +377,10 @@ ProgressBar pg;
 
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            catch (NullPointerException e){
+
                 e.printStackTrace();
             }
 
@@ -393,6 +423,14 @@ ProgressBar pg;
         protected void onPreExecute() {
             super.onPreExecute();
 submit.setVisibility(View.INVISIBLE);
+            camera.setVisibility(View.INVISIBLE);
+            attach.setVisibility(View.INVISIBLE);
+            progressDialog = new ProgressDialog(Home.this,R.style.MyTheme);
+            progressDialog.setCancelable(true);
+            progressDialog.setMessage("Please Wait");
+            progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+
+            progressDialog.show();
         }
 
         @Override
@@ -412,10 +450,40 @@ submit.setVisibility(View.INVISIBLE);
                 JSONObject j = new JSONObject(s);
                 complaint_id=j.getInt("complaint_id");
             }
+            catch (NullPointerException e){
+                e.printStackTrace();
+            }
             catch (JSONException e){
                 e.printStackTrace();
             }
-            Toast.makeText(getApplicationContext(), "complaint submitted"+""+complaint_id, Toast.LENGTH_LONG).show();
+            if(complaint_id==null){
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
+
+
+                builder.setTitle("Confirm");
+                builder.setMessage("Connection timeout");
+
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        //System.exit(0);
+                        progressDialog.dismiss();
+                        return;
+
+
+
+
+                    }
+
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+              //  Toast.makeText(getApplicationContext(), "Connection timeout...", Toast.LENGTH_LONG).show();
+              //  return;
+
+            }
 
             if(camera_image_path.size()!=0) {
                 for (Integer i = 0; i < camera_image_path.size(); i++) {
@@ -423,8 +491,10 @@ submit.setVisibility(View.INVISIBLE);
                     obj.execute(camera_image_path.get(i));
                 }
             }
-            else{
-               home_complaintHeadET.setText("");
+            else if(complaint_id!=null){
+                Toast.makeText(getApplicationContext(), "complaint submitted"+""+complaint_id, Toast.LENGTH_LONG).show();
+
+                home_complaintHeadET.setText("");
                 home_complaintET.setText("");
                 Intent i=new Intent(Home.this,StatusViewer.class);
                 startActivity(i);
@@ -475,7 +545,7 @@ submit.setVisibility(View.INVISIBLE);
             picturePath = cursor1.getString(columnIndex1);
             camera_image_path.add(compressImage(picturePath));
             cursor1.close();
-            Log.d("Picture Path", picturePath);
+            Log.d("Picture Path camere", picturePath);
         }
         catch(Exception e) {
             Log.e("Path Error", e.toString());
@@ -525,7 +595,7 @@ submit.setVisibility(View.INVISIBLE);
         }
 
 
-            ;
+
 
         }
         else if(requestCode==3){
@@ -541,7 +611,7 @@ submit.setVisibility(View.INVISIBLE);
              picturePath = cursor.getString(columnIndex);
             camera_image_path.add(compressImage(picturePath));
             cursor.close();
-            Log.d("Picture Path", picturePath);
+            Log.d("Picture Path attach", picturePath);
         }
         catch(Exception e) {
             Log.e("Path Error", e.toString());
@@ -664,7 +734,7 @@ submit.setVisibility(View.INVISIBLE);
             e.printStackTrace();
         }
         FileOutputStream out = null;
-        String filename =getOutputMediaFileUri().getPath();
+         filename =getOutputMediaFileUri().getPath();
         try {
             out = new FileOutputStream(filename);
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
@@ -673,6 +743,7 @@ submit.setVisibility(View.INVISIBLE);
             e.printStackTrace();
         }
 
+        Log.d("final path","111111"+filename);
         return filename;
 
     }
@@ -847,6 +918,7 @@ submit.setVisibility(View.INVISIBLE);
                 Log.e("Debug", "error: " + ioex.getMessage(), ioex);
             }
 
+            progressDialog.dismiss();
             Intent i=new Intent(Home.this,StatusViewer.class);
             startActivity(i);
             finish();

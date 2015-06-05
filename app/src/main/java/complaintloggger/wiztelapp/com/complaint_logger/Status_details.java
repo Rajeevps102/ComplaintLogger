@@ -45,8 +45,8 @@ intent=getIntent();
         for(Integer i=0;i<jsonlist.size();i++){
             try {
                 JSONObject jsonObject = new JSONObject(jsonlist.get(i));
-                if(jsonObject.getInt("complaint_id")==complaint_id) {
-                    Log.d("rajeev", "" + jsonObject.getString("header"));
+                if(jsonObject.getInt("id")==complaint_id) {
+                    Log.d("rajeev", "is22222222222222222" + jsonObject.getString("header"));
                     t1.setText(jsonObject.getString("header"));
                 }
             }

@@ -8,9 +8,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,13 +22,16 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 	static InputStream is = null;
@@ -53,7 +58,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
  */
 
 
-    public String makeServiceCall(String url1) {
+    public String makeServiceCall(String url1)  {
         try {
 
             Log.d("inside make","handler"+url1);
@@ -191,6 +196,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
 
         }
+
         catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -206,6 +212,12 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             }
         }
         return null;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+
     }
 
     @Override
@@ -239,6 +251,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             urlConnection.setRequestProperty("Accept", "application/json");
 
             urlConnection.setRequestMethod("POST");
+
             urlConnection.connect();
             OutputStreamWriter wr= new OutputStreamWriter(urlConnection.getOutputStream());
             Log.d("rajeev","sending json data"+jsonObject1.toString());
@@ -264,6 +277,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
             }
         }
+
         catch(JSONException e){
             e.printStackTrace();
 

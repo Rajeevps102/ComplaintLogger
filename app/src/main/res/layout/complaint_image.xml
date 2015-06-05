@@ -39,4 +39,6 @@
             android:id="@+id/compalint_Img3" />
     </LinearLayout>
 
-</LinearLayout>
+
+
+    </LinearLayout>

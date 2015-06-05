@@ -1,12 +1,15 @@
 package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.Activity;
+
 import android.content.Context;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -46,6 +49,8 @@ public class Login extends Activity implements View.OnClickListener {
     String mobile_number;
     String mail_id;
     String countryString;
+
+
 
     SharedPreferences splash;
     SharedPreferences.Editor editor;
@@ -110,10 +115,10 @@ public class Login extends Activity implements View.OnClickListener {
 
                 countryString=spinner_list.get(position);
 
-                if(countryString=="Select country"){
+           /*     if(spinner_list.get(0)=="Select country"){
 
-
-                }
+spinner_list.remove(0);
+                }  */
 
                // Toast.makeText(getApplicationContext(),countryString,Toast.LENGTH_LONG).show();
             }
@@ -180,6 +185,8 @@ public class Login extends Activity implements View.OnClickListener {
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
 
+
+
         if(validate()&&checknumber()&&checkmail()){
           //  Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
             Log.d("country","33333333333330"+countryString);
@@ -201,34 +208,51 @@ public class Login extends Activity implements View.OnClickListener {
     public  class Fetchspinner extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... strings) {
-            Log.d("raju",""+strings[0]);
-          String result= servicehandler.makeServiceCall(strings[0]);
-            Log.d("result","111111111111111111111111"+result);
+            Log.d("raju", "" + strings[0]);
+            String result = servicehandler.makeServiceCall(strings[0]);
+            Log.d("result", "111111111111111111111111" + result);
+            if (result == null) {
 
-            try {
-                JSONArray jsonArray=null;
-                JSONObject j=null;
-                JSONObject jsonObject = new JSONObject(result);
-                jsonArray=jsonObject.getJSONArray("country");
+              return null;
 
-                for(Integer i=0;i<jsonArray.length();i++){
-                    j=jsonArray.getJSONObject(i);
-                    String list=j.getString("organization_country");
+            } else {
 
-                    spinner_list.add(list);
-                    Log.d("result","111111111111111111111111"+j.getString("organization_country"));
+                try {
+
+                    JSONArray jsonArray = null;
+                    JSONObject j = null;
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        jsonArray = jsonObject.getJSONArray("country");
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    for (Integer i = 0; i < jsonArray.length(); i++) {
+                        j = jsonArray.getJSONObject(i);
+                        try {
+                            String list = j.getString("organization_country");
+                            spinner_list.add(list);
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
                 }
+
             }
+                return null;
 
-             catch (JSONException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-
-
-
-             return  null;
         }
 
 
@@ -241,6 +265,13 @@ public class Login extends Activity implements View.OnClickListener {
     user_name=uname.getText().toString();
     mobile_number=mob.getText().toString();
     mail_id=email.getText().toString();
+if(countryString=="Select country"){
+   Toast toast= Toast.makeText(getApplicationContext(),"Server Offline",Toast.LENGTH_LONG);
+    toast.setGravity(Gravity.CENTER, 0, 0);
+    toast.show();
+    return;
+}
+    register.setVisibility(View.INVISIBLE);
 
         JSONObject jsonObject =new JSONObject();
         try{
@@ -267,11 +298,27 @@ Login_interface login_interface=new Login_interface() {
     @Override
     public void oncompletion(JSONObject json) {
 
+if(json==null){
+    Toast toast=Toast.makeText(getApplicationContext(),"server offline",Toast.LENGTH_LONG);
+    toast.setGravity(Gravity.CENTER, 0, 0);
+
+    toast.show();
+
+register.setVisibility(View.VISIBLE);
+    return;
+
+}
+
         Log.d("final json from net", "111111111111" + json);
         try {
             id = json.getInt("id");
             Log.d("userid", "isssssssssss" + id);
-        } catch (JSONException e) {
+
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
