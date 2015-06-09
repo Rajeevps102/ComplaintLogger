@@ -37,6 +37,8 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 	static InputStream is = null;
 	static String response = null;
     HttpURLConnection urlConnection;
+    private static final int CONN_TIMEOUT = 15 * 1000;
+
 
     Context context;
     JSONObject jsonObject;
@@ -64,6 +66,9 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             Log.d("inside make","handler"+url1);
             URL url = new URL(url1);
             urlConnection = (HttpURLConnection) url.openConnection();
+         //   urlConnection.setConnectTimeout(CONN_TIMEOUT);
+        //   urlConnection.setReadTimeout(CONN_TIMEOUT);
+         //   urlConnection.connect();
 
                 InputStream in =urlConnection.getInputStream();
             Log.d("inside make","111111111111111111111111111111111111"+urlConnection.getInputStream());
@@ -90,8 +95,10 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             e.printStackTrace();
         }
         catch (Exception e) {
+          //  response=null;
             Log.e("Buffer Error", "Error: " + e.toString());
         }
+
         finally {
             urlConnection.disconnect();
         }
@@ -367,7 +374,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
     public String  makeServiceCall(Integer i){
         Log.d("rajeev","inside make"+i);
-        String url="http://10.0.0.130/complaintlogger/viewstatus.php";
+        String url="http://10.0.0.122/complaintlogger/viewstatus.php";
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("userid", i);

@@ -2,8 +2,10 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.Activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -50,13 +52,13 @@ public class Login extends Activity implements View.OnClickListener {
     String mail_id;
     String countryString;
 
-
+Boolean server_timeout=true;
 
     SharedPreferences splash;
     SharedPreferences.Editor editor;
     Servicehandler servicehandler=new Servicehandler();
     Fetchspinner spn=new Fetchspinner();
-    static String url="http://10.0.0.130/complaintlogger/addcomplaint.php";
+    static String url="http://10.0.0.122/complaintlogger/addcomplaint.php";
     ArrayList<String> spinner_list=new ArrayList<String>(); //**** list to populate the spinner****//
 
     // to check mobile number and email pattern//
@@ -199,7 +201,7 @@ spinner_list.remove(0);
             addingjsonvalues();
         }
            else{
-            Toast.makeText(getApplicationContext(),"Incorrect",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"enter valid data",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -212,8 +214,9 @@ spinner_list.remove(0);
             String result = servicehandler.makeServiceCall(strings[0]);
             Log.d("result", "111111111111111111111111" + result);
             if (result == null) {
+server_timeout=false;
 
-              return null;
+              //  Toast.makeText(getApplicationContext(), "Server timeout", Toast.LENGTH_LONG).show();
 
             } else {
 
@@ -255,7 +258,13 @@ spinner_list.remove(0);
 
         }
 
-
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(!server_timeout){
+                Toast.makeText(getApplicationContext(), "Server timeout", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     // to add json values like username mobile ...etc//
@@ -266,7 +275,7 @@ spinner_list.remove(0);
     mobile_number=mob.getText().toString();
     mail_id=email.getText().toString();
 if(countryString=="Select country"){
-   Toast toast= Toast.makeText(getApplicationContext(),"Server Offline",Toast.LENGTH_LONG);
+   Toast toast= Toast.makeText(getApplicationContext(),"Select country",Toast.LENGTH_LONG);
     toast.setGravity(Gravity.CENTER, 0, 0);
     toast.show();
     return;
@@ -285,7 +294,7 @@ if(countryString=="Select country"){
             e.printStackTrace();
 
         }
-         String login_url="http://10.0.0.130/complaintlogger/login.php";
+         String login_url="http://10.0.0.122/complaintlogger/login.php";
         servicehandler=new Servicehandler(Login.this,jsonObject,login_interface);
 
           servicehandler.execute(login_url);

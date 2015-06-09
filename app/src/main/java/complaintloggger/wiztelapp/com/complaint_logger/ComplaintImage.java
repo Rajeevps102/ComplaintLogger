@@ -94,7 +94,7 @@ public class ComplaintImage extends ActionBarActivity implements View.OnClickLis
             try {
               //
 
-                String url="http://10.0.0.130/complaintlogger/getImage.php";
+                String url="http://10.0.0.122/complaintlogger/getImage.php";
                 URL Url = new URL(url);
                 urlConnection = (HttpURLConnection) Url.openConnection();
                 urlConnection.setDoOutput(true);
@@ -146,7 +146,7 @@ catch(JSONException e){
         String pic = js.getString("photo_url");
 
         local_pic_path.add(pic);
-        pic = pic.replace("E:/wamp/www", "http://10.0.0.130:80");
+        pic = pic.replace("E:/wamp/www", "http://10.0.0.122:80");
         Log.d("trimstring0", "" + pic);
         pic_path.add(pic);
     }

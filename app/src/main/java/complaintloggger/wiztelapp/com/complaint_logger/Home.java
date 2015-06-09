@@ -83,8 +83,8 @@ ProgressBar pg;
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
 
-    static String url = "http://10.0.0.130/complaintlogger/fetchorg.php";
-    static String complaint_url = "http://10.0.0.130/complaintlogger/complaints.php";
+    static String url = "http://10.0.0.122/complaintlogger/fetchorg.php";
+    static String complaint_url = "http://10.0.0.122/complaintlogger/complaints.php";
     private Uri fileUri;
     ArrayList<String> organization_list = new ArrayList<String>(); //**** list to populate the spinner****//
     Fetchorganization fetchorg = new Fetchorganization();
@@ -827,7 +827,7 @@ submit.setVisibility(View.INVISIBLE);
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
             String responseFromServer = "";
-            String urlString = "http://10.0.0.130/complaintlogger/uploadimage.php";
+            String urlString = "http://10.0.0.122/complaintlogger/uploadimage.php";
             Log.d("jobin", "3");
             try {
 
