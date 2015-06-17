@@ -72,6 +72,7 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     String filename;// used in getoutputmedia
     Bitmap bitmap;
     Uri photoUri;
+    Integer Rand_id;
     public Integer attach_count=0;
     public Integer count=0;
     public Integer complaint_id;
@@ -83,8 +84,8 @@ ProgressBar pg;
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
 
-    static String url = "http://10.0.0.122/complaintlogger/fetchorg.php";
-    static String complaint_url = "http://10.0.0.122/complaintlogger/complaints.php";
+    static String url = "http://220.227.57.26/complaint_logger/fetchorg.php";
+    static String complaint_url = "http://220.227.57.26/complaint_logger/complaints.php";
     private Uri fileUri;
     ArrayList<String> organization_list = new ArrayList<String>(); //**** list to populate the spinner****//
     Fetchorganization fetchorg = new Fetchorganization();
@@ -92,7 +93,7 @@ ProgressBar pg;
     Button submit;
     Toolbar toolbar;
     JSONObject jsonObject;
-
+    Integer image_upload_count=0; // for image upload count
     String ComplaintHeadString, ComplaintString, OrganizationString; //string that store complaint subject  complaint, and organization name that is selected from spinner
 
     /*The home class is loaded on successful user verification at the login process. the Home class
@@ -427,7 +428,7 @@ submit.setVisibility(View.INVISIBLE);
             attach.setVisibility(View.INVISIBLE);
             progressDialog = new ProgressDialog(Home.this,R.style.MyTheme);
             progressDialog.setCancelable(true);
-            progressDialog.setMessage("Please Wait");
+          //  progressDialog.setMessage("Please Wait");
             progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
 
             progressDialog.show();
@@ -448,7 +449,9 @@ submit.setVisibility(View.INVISIBLE);
             Log.d("rajeev", "111111111" + s);
             try {
                 JSONObject j = new JSONObject(s);
-                complaint_id=j.getInt("complaint_id");
+                complaint_id=j.getInt("id");
+                Rand_id=j.getInt("complaint_id");
+                Log.d("rrrrrrrrrrrrr",""+j.getInt("complaint_id"));
             }
             catch (NullPointerException e){
                 e.printStackTrace();
@@ -488,11 +491,19 @@ submit.setVisibility(View.INVISIBLE);
             if(camera_image_path.size()!=0) {
                 for (Integer i = 0; i < camera_image_path.size(); i++) {
                     RetrieveFeedTask obj = new RetrieveFeedTask();
+                    image_upload_count=image_upload_count+1;
                     obj.execute(camera_image_path.get(i));
+                    if(image_upload_count==camera_image_path.size()) {
+                        progressDialog.dismiss();
+                        Log.d("inside my if loop","");
+                        Intent intnt = new Intent(Home.this, StatusViewer.class);
+                        startActivity(intnt);
+                        finish();
+                    }
                 }
             }
-            else if(complaint_id!=null){
-                Toast.makeText(getApplicationContext(), "complaint submitted"+""+complaint_id, Toast.LENGTH_LONG).show();
+            else{
+            //    Toast.makeText(getApplicationContext(), "complaint submitted"+""+complaint_id, Toast.LENGTH_LONG).show();
 
                 home_complaintHeadET.setText("");
                 home_complaintET.setText("");
@@ -827,7 +838,7 @@ submit.setVisibility(View.INVISIBLE);
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
             String responseFromServer = "";
-            String urlString = "http://10.0.0.122/complaintlogger/uploadimage.php";
+            String urlString = "http://220.227.57.26/complaint_logger/uploadimage.php";
             Log.d("jobin", "3");
             try {
 
@@ -848,7 +859,8 @@ submit.setVisibility(View.INVISIBLE);
                 Log.d("jobin", "4");
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Connection", "Keep-Alive");
-                conn.setRequestProperty("cookie",complaint_id.toString());
+                conn.setRequestProperty("id",complaint_id.toString());
+                conn.setRequestProperty("complaint_id",Rand_id.toString());
                 conn.setRequestProperty("Content-Type",
                         "multipart/form-data;boundary=" + boundary);
 
@@ -918,10 +930,14 @@ submit.setVisibility(View.INVISIBLE);
                 Log.e("Debug", "error: " + ioex.getMessage(), ioex);
             }
 
-            progressDialog.dismiss();
-            Intent i=new Intent(Home.this,StatusViewer.class);
-            startActivity(i);
-            finish();
+
+         /*   if(image_upload_count==camera_image_path.size()) {
+                progressDialog.dismiss();
+                Log.d("inside my if loop","");
+                Intent i = new Intent(Home.this, StatusViewer.class);
+                startActivity(i);
+                finish();
+            }  */
 return null;
         }
     }

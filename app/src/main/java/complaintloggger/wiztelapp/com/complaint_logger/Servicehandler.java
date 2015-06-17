@@ -374,7 +374,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
     public String  makeServiceCall(Integer i){
         Log.d("rajeev","inside make"+i);
-        String url="http://10.0.0.122/complaintlogger/viewstatus.php";
+        String url="http://220.227.57.26/complaint_logger/viewstatus.php";
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("userid", i);

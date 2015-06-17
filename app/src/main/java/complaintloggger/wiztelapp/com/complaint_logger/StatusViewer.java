@@ -1,6 +1,7 @@
 package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,6 +48,8 @@ public  Integer userid;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.status_viewer_page);
 status_listview=(ListView)findViewById(R.id.listView);
+
+
 
 //////////// shared pref///////////////////////////////////////////
         sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
@@ -146,9 +149,22 @@ complaint_details.execute(userid);
 
 public  class Complaint_details extends AsyncTask<Integer, Void, String> {
 
+    ProgressDialog progressDialog; ////for showing progress
+
 public Complaint_details(){
 
 }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        progressDialog = new ProgressDialog(StatusViewer.this,R.style.MyTheme);
+        progressDialog.setCancelable(true);
+        progressDialog.setMessage("Fetching complaints");
+        progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+
+        progressDialog.show();
+    }
 
     @Override
     protected String doInBackground(Integer... integers) {
@@ -159,6 +175,7 @@ public Complaint_details(){
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+progressDialog.dismiss();
         Log.d("rajeev","inside post");
         Log.d("rajeev",""+s);
         JSONArray result=null;

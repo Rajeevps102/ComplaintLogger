@@ -58,7 +58,7 @@ Boolean server_timeout=true;
     SharedPreferences.Editor editor;
     Servicehandler servicehandler=new Servicehandler();
     Fetchspinner spn=new Fetchspinner();
-    static String url="http://10.0.0.122/complaintlogger/addcomplaint.php";
+    static String url="http://220.227.57.26/complaint_logger/addcomplaint.php";
     ArrayList<String> spinner_list=new ArrayList<String>(); //**** list to populate the spinner****//
 
     // to check mobile number and email pattern//
@@ -294,7 +294,7 @@ if(countryString=="Select country"){
             e.printStackTrace();
 
         }
-         String login_url="http://10.0.0.122/complaintlogger/login.php";
+         String login_url="http://220.227.57.26/complaint_logger/login.php";
         servicehandler=new Servicehandler(Login.this,jsonObject,login_interface);
 
           servicehandler.execute(login_url);

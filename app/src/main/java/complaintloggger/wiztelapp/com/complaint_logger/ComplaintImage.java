@@ -1,8 +1,10 @@
 package complaintloggger.wiztelapp.com.complaint_logger;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -77,6 +79,7 @@ public class ComplaintImage extends ActionBarActivity implements View.OnClickLis
 
 
     public class FetchImage extends AsyncTask<Integer, Void, Void>{
+        ProgressDialog progressDialog;
 
         public FetchImage() {
 
@@ -94,7 +97,7 @@ public class ComplaintImage extends ActionBarActivity implements View.OnClickLis
             try {
               //
 
-                String url="http://10.0.0.122/complaintlogger/getImage.php";
+                String url="http://220.227.57.26/complaint_logger/getImage.php";
                 URL Url = new URL(url);
                 urlConnection = (HttpURLConnection) Url.openConnection();
                 urlConnection.setDoOutput(true);
@@ -146,9 +149,9 @@ catch(JSONException e){
         String pic = js.getString("photo_url");
 
         local_pic_path.add(pic);
-        pic = pic.replace("E:/wamp/www", "http://10.0.0.122:80");
+        pic = pic.replace("/complaint_images", "http://220.227.57.26/complaint_logger/complaint_images");
         Log.d("trimstring0", "" + pic);
-        pic_path.add(pic);
+        pic_path.add(pic);  // server path
     }
 
 
@@ -192,23 +195,34 @@ catch(JSONException e){
             local_pic_path.clear();
             pic_path.clear();
             sdcard_path.clear();
+            progressDialog = new ProgressDialog(ComplaintImage.this,R.style.MyTheme);
+            progressDialog.setCancelable(true);
+
+            progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+
+            progressDialog.show();
         }
 
         @Override
         protected void onPostExecute(Void aVoid)
         {
             // super.onPostExecute(aVoid);
+            progressDialog.dismiss();
+
             if(pic_path.size()==0){
                 Toast.makeText(getApplicationContext(),"no pic to display",Toast.LENGTH_LONG).show();
 
 
             }
-            else {
+           else if(local_pic_path.size()!=0) {
 
 
                 getimagesfromsd();
 
                 if (isfileexist()) {
+
+
+                    Log.d("11111111111111111111111", "" + "inside web service" + valid);
                     for (Integer i = 0; i < sdcard_path.size(); i++)
                         try {
                             bitmap = BitmapFactory.decodeFile(sdcard_path.get(0));
@@ -218,6 +232,7 @@ catch(JSONException e){
                             bitmap3 = BitmapFactory.decodeFile(sdcard_path.get(2));
                             imageView3.setImageBitmap(bitmap3);
 
+
                         } catch (IndexOutOfBoundsException e) {
                             e.printStackTrace();
                         } catch (Exception e) {
@@ -225,14 +240,14 @@ catch(JSONException e){
                         }
 
                     Log.d("11111111111111111111111", "" + "inside sd");
-                } else if (pic_path.size() != 0) {
+                } else {
 
                     Log.d("11111111111111111111111", "" + "inside web service");
                     displaypic.execute(pic_path);
 
                 }
-
             }
+
         }
     }
 
@@ -240,16 +255,20 @@ catch(JSONException e){
 
     public void getimagesfromsd(){
         local_path="/storage/sdcard0/Pictures/ComplaintLogger/";
-        server_path="E:/wamp/www/uploadtry/";
+
 
             for (Integer i = 0; i < local_pic_path.size(); i++) {
                 String eg = local_pic_path.get(i);
-                eg = eg.replace(server_path, "");
-
-                Log.d("11111111111111111111111", "" + eg);
 
 
-                sdcard_path.add(local_path.concat(eg));
+                Log.d("function to get the img", "" + eg);
+                for (String retval: eg.split("/")){
+                   server_path=retval;
+                }
+                Log.d("functi img", "" + server_path);
+                Log.d("function to get the img", "" + local_path.concat(server_path));
+              //  sdcard_path.add(local_path.concat(eg));
+                sdcard_path.add(local_path.concat(server_path));
             }
 
     }
@@ -265,18 +284,26 @@ catch(JSONException e){
             valid = false;
         }
     }
-
+        Log.d("11111111111111111111111", "" + "inside web service"+valid);
     return valid;
 
     }
 
     public class Displaypic extends AsyncTask<ArrayList<String>, Void, Void>{
+        ProgressDialog progressDialog;
         public Displaypic() {
         }
 
         @Override
         protected void onPreExecute() {
+
             super.onPreExecute();
+            progressDialog = new ProgressDialog(ComplaintImage.this,R.style.MyTheme);
+            progressDialog.setCancelable(true);
+
+            progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+
+            progressDialog.show();
         }
 
         @Override
@@ -286,6 +313,7 @@ catch(JSONException e){
                 bitmap = BitmapFactory.decodeStream((InputStream) new URL(arrayLists[0].get(0)).getContent());
                 bitmap2=BitmapFactory.decodeStream((InputStream) new URL(arrayLists[0].get(1)).getContent());
                 bitmap3=BitmapFactory.decodeStream((InputStream) new URL(arrayLists[0].get(2)).getContent());
+
                 Log.d("rajeev",""+bitmap);
             }catch (IndexOutOfBoundsException e){
                 e.printStackTrace();
@@ -302,7 +330,7 @@ catch(JSONException e){
            // BitmapFactory.Options opt = new BitmapFactory.Options();
            // opt.inSampleSize = 5;
           //  Bitmap b = BitmapFactory.decodeFile(pic, opt);
-
+            progressDialog.dismiss();
                 imageView1.setImageBitmap(bitmap);
 
 
@@ -311,7 +339,6 @@ catch(JSONException e){
 
 
             imageView3.setImageBitmap(bitmap3);
-Log.d("finallocalpath",""+new Home().getOutputMediaFileUri().toString());
 
         }
 
