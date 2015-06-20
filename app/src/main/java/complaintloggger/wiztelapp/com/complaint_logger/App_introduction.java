@@ -3,18 +3,22 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 /**
  * Created by Raju on 20-06-2015.
  */
-public class App_introduction extends Activity {
+public class App_introduction extends Activity implements View.OnClickListener {
 
     float x1,x2;
     float y1, y2;
     Integer count=1;
+    Button signin;
 
     Fragment1 fragment1=new Fragment1();
     Fragment2 fragment_2=new Fragment2();
@@ -26,6 +30,8 @@ public class App_introduction extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_introduction_xml);
+        signin=(Button)findViewById(R.id.button2);
+        signin.setOnClickListener(this);
     }
 
     @Override
@@ -151,4 +157,9 @@ public class App_introduction extends Activity {
         return false;
     }
 
+    @Override
+    public void onClick(View view) {
+        final Intent login=new Intent(App_introduction.this,Login.class);
+        startActivity(login);
+    }
 }
