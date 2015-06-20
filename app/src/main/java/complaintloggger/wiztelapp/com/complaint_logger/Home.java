@@ -22,9 +22,11 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -122,6 +124,16 @@ ProgressBar pg;
 
         home_complaintHeadET = (EditText) findViewById(R.id.home_complaintHeadET);
         home_complaintET = (EditText) findViewById(R.id.home_complaintET);
+
+        int settings = EditorInfo.TYPE_CLASS_TEXT;
+        home_complaintHeadET.setInputType(settings);
+        home_complaintHeadET.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+
+
+        home_complaintET.setInputType(settings);
+        home_complaintET.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+
         initToolbars();
 
         submit = (Button) findViewById(R.id.home_submitBtn);
@@ -392,6 +404,13 @@ ProgressBar pg;
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            if(organization_list.size()==0){
+                Toast toast= Toast.makeText(getApplicationContext(),"connection timeout...",Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+
+            }
 
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_item, organization_list);
             organizationListSpinner.setAdapter(adapter);

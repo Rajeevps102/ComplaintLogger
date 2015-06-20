@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -92,6 +93,18 @@ Boolean server_timeout=true;
         uname=(EditText)findViewById(R.id.username);
         email=(EditText)findViewById(R.id.mail);
         mob=(EditText)findViewById(R.id.mobile);
+
+        int settings = EditorInfo.TYPE_CLASS_TEXT;
+        uname.setInputType(settings);
+        uname.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+
+        mob.setInputType(settings);
+        mob.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+
+        email.setInputType(settings);
+        email.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+
         register.setOnClickListener(this);
 
 
