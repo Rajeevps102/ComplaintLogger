@@ -2,6 +2,7 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,9 +22,11 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -57,6 +60,7 @@ import java.util.Locale;
  */
 public class Home extends ActionBarActivity implements View.OnClickListener {
 
+
     Servicehandler servicehandler = new Servicehandler();
     Spinner organizationListSpinner;
     SharedPreferences sp;
@@ -67,8 +71,10 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     ImageView home_compalintImg3,home_compalintImg2,home_compalintImg1;
     String loc;
     String picturePath; // used in attachment
+    String filename;// used in getoutputmedia
     Bitmap bitmap;
     Uri photoUri;
+    Integer Rand_id;
     public Integer attach_count=0;
     public Integer count=0;
     public Integer complaint_id;
@@ -76,10 +82,12 @@ public class Home extends ActionBarActivity implements View.OnClickListener {
     ImageView camera, attach;
     ArrayList<String>camera_image_path=new ArrayList<>();
 ProgressBar pg;
+    ProgressDialog progressDialog;
     String json_string;//for json string
     Complaint_webservice complaint_webservice = new Complaint_webservice();
-    static String url = "http://10.0.0.130/complaintlogger/fetchorg.php";
-    static String complaint_url = "http://10.0.0.130/complaintlogger/complaints.php";
+
+    static String url = "http://220.227.57.26/complaint_logger/fetchorg.php";
+    static String complaint_url = "http://220.227.57.26/complaint_logger/complaints.php";
     private Uri fileUri;
     ArrayList<String> organization_list = new ArrayList<String>(); //**** list to populate the spinner****//
     Fetchorganization fetchorg = new Fetchorganization();
@@ -87,7 +95,7 @@ ProgressBar pg;
     Button submit;
     Toolbar toolbar;
     JSONObject jsonObject;
-
+    Integer image_upload_count=0; // for image upload count
     String ComplaintHeadString, ComplaintString, OrganizationString; //string that store complaint subject  complaint, and organization name that is selected from spinner
 
     /*The home class is loaded on successful user verification at the login process. the Home class
@@ -109,12 +117,24 @@ ProgressBar pg;
 
         home_complaintHeadET = (EditText) findViewById(R.id.home_complaintHeadET);
         home_complaintET = (EditText) findViewById(R.id.home_complaintET);
+
+        int settings = EditorInfo.TYPE_CLASS_TEXT;
+        home_complaintHeadET.setInputType(settings);
+        home_complaintHeadET.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+
+
+        home_complaintET.setInputType(settings);
+        home_complaintET.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+
         initToolbars();
 
         submit = (Button) findViewById(R.id.home_submitBtn);
         pg=(ProgressBar)findViewById(R.id.pbHeaderProgress);
         pg.setVisibility(View.GONE);
         submit.setOnClickListener(this);
+
+
         sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
         editor = sp.edit();
         selctedcountryname = sp.getString("selectedcountryname", "");
@@ -125,6 +145,8 @@ ProgressBar pg;
 
 
         fetchorg.execute(selctedcountryname);
+
+
         home_compalintImg1=(ImageView)findViewById(R.id.home_compalintImg1);
         home_compalintImg2=(ImageView)findViewById(R.id.home_compalintImg2);
         home_compalintImg3=(ImageView)findViewById(R.id.home_compalintImg3);
@@ -135,7 +157,7 @@ ProgressBar pg;
         home_compalintImg1.setOnClickListener(this);
         home_compalintImg2.setOnClickListener(this);
         home_compalintImg3.setOnClickListener(this);
-
+        home_complaintET.setOnClickListener(this);
 
     }
 
@@ -268,12 +290,20 @@ ProgressBar pg;
                 startActivityForResult(intent3,3);
                 break;
 
-
+            case R.id.home_complaintET:
+                home_complaintET.setError(null);
+                break;
 
         }
     }
 
     public void addingjsonvalues() {
+
+        if(OrganizationString==null){  // if server is down
+            Toast.makeText(getApplicationContext(),"Server is offline",Toast.LENGTH_LONG).show();
+            return;
+        }
+
         ComplaintHeadString = home_complaintHeadET.getText().toString();
         ComplaintString = home_complaintET.getText().toString();
 
@@ -298,6 +328,7 @@ ProgressBar pg;
         }
         else{
             Toast.makeText(getApplicationContext(),"enter valid data",Toast.LENGTH_LONG).show();
+            home_complaintET.setError("enter valid data");
         }
     }
 
@@ -326,8 +357,16 @@ ProgressBar pg;
             try {
                 JSONArray jsonArray = null;
                 JSONObject j = null;
-                JSONObject jsonObject = new JSONObject(result);
-                jsonArray = jsonObject.getJSONArray("organization");
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    jsonArray = jsonObject.getJSONArray("organization");
+                }catch (NullPointerException e){
+
+                    e.printStackTrace();
+                }
+                catch(JSONException e){
+                    e.printStackTrace();
+                }
 
                 for (Integer i = 0; i < jsonArray.length(); i++) {
                     j = jsonArray.getJSONObject(i);
@@ -346,6 +385,10 @@ ProgressBar pg;
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            catch (NullPointerException e){
+
+                e.printStackTrace();
+            }
 
 
             return null;
@@ -354,6 +397,13 @@ ProgressBar pg;
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            if(organization_list.size()==0){
+                Toast toast= Toast.makeText(getApplicationContext(),"connection timeout...",Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+
+            }
 
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_item, organization_list);
             organizationListSpinner.setAdapter(adapter);
@@ -386,6 +436,14 @@ ProgressBar pg;
         protected void onPreExecute() {
             super.onPreExecute();
 submit.setVisibility(View.INVISIBLE);
+            camera.setVisibility(View.INVISIBLE);
+            attach.setVisibility(View.INVISIBLE);
+            progressDialog = new ProgressDialog(Home.this,R.style.MyTheme);
+            progressDialog.setCancelable(true);
+          //  progressDialog.setMessage("Please Wait");
+            progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+
+            progressDialog.show();
         }
 
         @Override
@@ -403,21 +461,63 @@ submit.setVisibility(View.INVISIBLE);
             Log.d("rajeev", "111111111" + s);
             try {
                 JSONObject j = new JSONObject(s);
-                complaint_id=j.getInt("complaint_id");
+                complaint_id=j.getInt("id");
+                Rand_id=j.getInt("complaint_id");
+                Log.d("rrrrrrrrrrrrr",""+j.getInt("complaint_id"));
+            }
+            catch (NullPointerException e){
+                e.printStackTrace();
             }
             catch (JSONException e){
                 e.printStackTrace();
             }
-            Toast.makeText(getApplicationContext(), "complaint submitted"+""+complaint_id, Toast.LENGTH_LONG).show();
+            if(complaint_id==null){
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
+
+
+                builder.setTitle("Confirm");
+                builder.setMessage("Connection timeout");
+
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        //System.exit(0);
+                        progressDialog.dismiss();
+                        return;
+
+
+
+
+                    }
+
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+              //  Toast.makeText(getApplicationContext(), "Connection timeout...", Toast.LENGTH_LONG).show();
+              //  return;
+
+            }
 
             if(camera_image_path.size()!=0) {
                 for (Integer i = 0; i < camera_image_path.size(); i++) {
                     RetrieveFeedTask obj = new RetrieveFeedTask();
+                    image_upload_count=image_upload_count+1;
                     obj.execute(camera_image_path.get(i));
+                    if(image_upload_count==camera_image_path.size()) {
+                        progressDialog.dismiss();
+                        Log.d("inside my if loop","");
+                        Intent intnt = new Intent(Home.this, StatusViewer.class);
+                        startActivity(intnt);
+                        finish();
+                    }
                 }
             }
             else{
-               home_complaintHeadET.setText("");
+            //    Toast.makeText(getApplicationContext(), "complaint submitted"+""+complaint_id, Toast.LENGTH_LONG).show();
+
+                home_complaintHeadET.setText("");
                 home_complaintET.setText("");
                 Intent i=new Intent(Home.this,StatusViewer.class);
                 startActivity(i);
@@ -468,7 +568,7 @@ submit.setVisibility(View.INVISIBLE);
             picturePath = cursor1.getString(columnIndex1);
             camera_image_path.add(compressImage(picturePath));
             cursor1.close();
-            Log.d("Picture Path", picturePath);
+            Log.d("Picture Path camere", picturePath);
         }
         catch(Exception e) {
             Log.e("Path Error", e.toString());
@@ -518,7 +618,7 @@ submit.setVisibility(View.INVISIBLE);
         }
 
 
-            ;
+
 
         }
         else if(requestCode==3){
@@ -534,7 +634,7 @@ submit.setVisibility(View.INVISIBLE);
              picturePath = cursor.getString(columnIndex);
             camera_image_path.add(compressImage(picturePath));
             cursor.close();
-            Log.d("Picture Path", picturePath);
+            Log.d("Picture Path attach", picturePath);
         }
         catch(Exception e) {
             Log.e("Path Error", e.toString());
@@ -657,7 +757,7 @@ submit.setVisibility(View.INVISIBLE);
             e.printStackTrace();
         }
         FileOutputStream out = null;
-        String filename =getOutputMediaFileUri().getPath();
+         filename =getOutputMediaFileUri().getPath();
         try {
             out = new FileOutputStream(filename);
             scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
@@ -666,6 +766,7 @@ submit.setVisibility(View.INVISIBLE);
             e.printStackTrace();
         }
 
+        Log.d("final path","111111"+filename);
         return filename;
 
     }
@@ -749,7 +850,7 @@ submit.setVisibility(View.INVISIBLE);
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
             String responseFromServer = "";
-            String urlString = "http://10.0.0.130/complaintlogger/uploadimage.php";
+            String urlString = "http://220.227.57.26/complaint_logger/uploadimage.php";
             Log.d("jobin", "3");
             try {
 
@@ -770,7 +871,8 @@ submit.setVisibility(View.INVISIBLE);
                 Log.d("jobin", "4");
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Connection", "Keep-Alive");
-                conn.setRequestProperty("cookie",complaint_id.toString());
+                conn.setRequestProperty("id",complaint_id.toString());
+                conn.setRequestProperty("complaint_id",Rand_id.toString());
                 conn.setRequestProperty("Content-Type",
                         "multipart/form-data;boundary=" + boundary);
 
@@ -840,9 +942,14 @@ submit.setVisibility(View.INVISIBLE);
                 Log.e("Debug", "error: " + ioex.getMessage(), ioex);
             }
 
-            Intent i=new Intent(Home.this,StatusViewer.class);
-            startActivity(i);
-            finish();
+
+         /*   if(image_upload_count==camera_image_path.size()) {
+                progressDialog.dismiss();
+                Log.d("inside my if loop","");
+                Intent i = new Intent(Home.this, StatusViewer.class);
+                startActivity(i);
+                finish();
+            }  */
 return null;
         }
     }

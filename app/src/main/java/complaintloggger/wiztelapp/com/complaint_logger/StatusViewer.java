@@ -1,6 +1,7 @@
 package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,6 +48,8 @@ public  Integer userid;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.status_viewer_page);
 status_listview=(ListView)findViewById(R.id.listView);
+
+
 
 //////////// shared pref///////////////////////////////////////////
         sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
@@ -146,9 +149,22 @@ complaint_details.execute(userid);
 
 public  class Complaint_details extends AsyncTask<Integer, Void, String> {
 
+    ProgressDialog progressDialog; ////for showing progress
+
 public Complaint_details(){
 
 }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        progressDialog = new ProgressDialog(StatusViewer.this,R.style.MyTheme);
+        progressDialog.setCancelable(true);
+        progressDialog.setMessage("Fetching complaints");
+        progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+
+        progressDialog.show();
+    }
 
     @Override
     protected String doInBackground(Integer... integers) {
@@ -159,13 +175,24 @@ public Complaint_details(){
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
+progressDialog.dismiss();
         Log.d("rajeev","inside post");
         Log.d("rajeev",""+s);
         JSONArray result=null;
         JSONObject jobj=null;
         try {
-            JSONObject jsonObject = new JSONObject(s);
-            result=jsonObject.getJSONArray("result");
+
+            try {
+                JSONObject jsonObject = new JSONObject(s);
+                result = jsonObject.getJSONArray("result");
+            }
+            catch (NullPointerException e){
+
+                e.printStackTrace();
+            }
+            catch(JSONException e){
+                e.printStackTrace();
+            }
             for(Integer i=0;i<result.length();i++){
                 jobj=result.getJSONObject(i);
                 jsonObjectArrayList.add(jobj.toString());
@@ -178,16 +205,25 @@ public Complaint_details(){
         catch (JSONException e){
             e.printStackTrace();
         }
-        status_listview.setAdapter(new Base(con, complaint_id, complaint_head, complaint_status));
+        catch (NullPointerException e){
+
+            e.printStackTrace();
+        }
+        if(result==null){
+            Toast.makeText(getApplicationContext(),"No complaints to display",Toast.LENGTH_LONG).show();
+        }
+        else {
+            status_listview.setAdapter(new Base(con, id, complaint_head, complaint_status));
+        }
     }
 }
 
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
         // TODO Auto-generated method stub
 
-        Toast.makeText(getApplicationContext(), "You clicked on position : " + arg2 + " and id : " + arg3, Toast.LENGTH_LONG).show();
+      //  Toast.makeText(getApplicationContext(), "You clicked on position : " + arg2 + " and id : " + arg3, Toast.LENGTH_LONG).show();
        Integer i=id.get(arg2);
-        Toast.makeText(getApplicationContext(), "You clicked on position : " + i + " and id : " + i, Toast.LENGTH_LONG).show();
+     //   Toast.makeText(getApplicationContext(), "You clicked on position : " + i + " and id : " + i, Toast.LENGTH_LONG).show();
 
         final Intent intent=new Intent(StatusViewer.this,Status_details.class);
         intent.putExtra("complaint_id",i);

@@ -8,9 +8,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,18 +22,23 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 	static InputStream is = null;
 	static String response = null;
     HttpURLConnection urlConnection;
+    private static final int CONN_TIMEOUT = 15 * 1000;
+
 
     Context context;
     JSONObject jsonObject;
@@ -53,12 +60,15 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
  */
 
 
-    public String makeServiceCall(String url1) {
+    public String makeServiceCall(String url1)  {
         try {
 
             Log.d("inside make","handler"+url1);
             URL url = new URL(url1);
             urlConnection = (HttpURLConnection) url.openConnection();
+         //   urlConnection.setConnectTimeout(CONN_TIMEOUT);
+        //   urlConnection.setReadTimeout(CONN_TIMEOUT);
+         //   urlConnection.connect();
 
                 InputStream in =urlConnection.getInputStream();
             Log.d("inside make","111111111111111111111111111111111111"+urlConnection.getInputStream());
@@ -85,8 +95,10 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             e.printStackTrace();
         }
         catch (Exception e) {
+          //  response=null;
             Log.e("Buffer Error", "Error: " + e.toString());
         }
+
         finally {
             urlConnection.disconnect();
         }
@@ -191,6 +203,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
 
         }
+
         catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -206,6 +219,12 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             }
         }
         return null;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+
     }
 
     @Override
@@ -239,6 +258,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             urlConnection.setRequestProperty("Accept", "application/json");
 
             urlConnection.setRequestMethod("POST");
+
             urlConnection.connect();
             OutputStreamWriter wr= new OutputStreamWriter(urlConnection.getOutputStream());
             Log.d("rajeev","sending json data"+jsonObject1.toString());
@@ -264,6 +284,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
             }
         }
+
         catch(JSONException e){
             e.printStackTrace();
 
@@ -353,7 +374,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
     public String  makeServiceCall(Integer i){
         Log.d("rajeev","inside make"+i);
-        String url="http://10.0.0.130/complaintlogger/viewstatus.php";
+        String url="http://220.227.57.26/complaint_logger/viewstatus.php";
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("userid", i);

@@ -1,13 +1,19 @@
 package complaintloggger.wiztelapp.com.complaint_logger;
 
 import android.app.Activity;
+
+import android.app.AlertDialog;
 import android.content.Context;
+
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -47,11 +53,13 @@ public class Login extends Activity implements View.OnClickListener {
     String mail_id;
     String countryString;
 
+Boolean server_timeout=true;
+
     SharedPreferences splash;
     SharedPreferences.Editor editor;
     Servicehandler servicehandler=new Servicehandler();
     Fetchspinner spn=new Fetchspinner();
-    static String url="http://10.0.0.130/complaintlogger/addcomplaint.php";
+    static String url="http://220.227.57.26/complaint_logger/addcomplaint.php";
     ArrayList<String> spinner_list=new ArrayList<String>(); //**** list to populate the spinner****//
 
     // to check mobile number and email pattern//
@@ -85,6 +93,18 @@ public class Login extends Activity implements View.OnClickListener {
         uname=(EditText)findViewById(R.id.username);
         email=(EditText)findViewById(R.id.mail);
         mob=(EditText)findViewById(R.id.mobile);
+
+        int settings = EditorInfo.TYPE_CLASS_TEXT;
+        uname.setInputType(settings);
+        uname.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+
+        mob.setInputType(settings);
+        mob.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+
+        email.setInputType(settings);
+        email.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+
         register.setOnClickListener(this);
 
 
@@ -110,10 +130,10 @@ public class Login extends Activity implements View.OnClickListener {
 
                 countryString=spinner_list.get(position);
 
-                if(countryString=="Select country"){
+           /*     if(spinner_list.get(0)=="Select country"){
 
-
-                }
+spinner_list.remove(0);
+                }  */
 
                // Toast.makeText(getApplicationContext(),countryString,Toast.LENGTH_LONG).show();
             }
@@ -180,6 +200,8 @@ public class Login extends Activity implements View.OnClickListener {
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
 
+
+
         if(validate()&&checknumber()&&checkmail()){
           //  Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
             Log.d("country","33333333333330"+countryString);
@@ -192,7 +214,7 @@ public class Login extends Activity implements View.OnClickListener {
             addingjsonvalues();
         }
            else{
-            Toast.makeText(getApplicationContext(),"Incorrect",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"enter valid data",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -201,37 +223,61 @@ public class Login extends Activity implements View.OnClickListener {
     public  class Fetchspinner extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... strings) {
-            Log.d("raju",""+strings[0]);
-          String result= servicehandler.makeServiceCall(strings[0]);
-            Log.d("result","111111111111111111111111"+result);
+            Log.d("raju", "" + strings[0]);
+            String result = servicehandler.makeServiceCall(strings[0]);
+            Log.d("result", "111111111111111111111111" + result);
+            if (result == null) {
+server_timeout=false;
 
-            try {
-                JSONArray jsonArray=null;
-                JSONObject j=null;
-                JSONObject jsonObject = new JSONObject(result);
-                jsonArray=jsonObject.getJSONArray("country");
+              //  Toast.makeText(getApplicationContext(), "Server timeout", Toast.LENGTH_LONG).show();
 
-                for(Integer i=0;i<jsonArray.length();i++){
-                    j=jsonArray.getJSONObject(i);
-                    String list=j.getString("organization_country");
+            } else {
 
-                    spinner_list.add(list);
-                    Log.d("result","111111111111111111111111"+j.getString("organization_country"));
+                try {
+
+                    JSONArray jsonArray = null;
+                    JSONObject j = null;
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        jsonArray = jsonObject.getJSONArray("country");
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    for (Integer i = 0; i < jsonArray.length(); i++) {
+                        j = jsonArray.getJSONObject(i);
+                        try {
+                            String list = j.getString("organization_country");
+                            spinner_list.add(list);
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
                 }
+
             }
+                return null;
 
-             catch (JSONException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-
-
-
-             return  null;
         }
 
-
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(!server_timeout){
+                Toast.makeText(getApplicationContext(), "Server timeout", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     // to add json values like username mobile ...etc//
@@ -241,6 +287,13 @@ public class Login extends Activity implements View.OnClickListener {
     user_name=uname.getText().toString();
     mobile_number=mob.getText().toString();
     mail_id=email.getText().toString();
+if(countryString=="Select country"){
+   Toast toast= Toast.makeText(getApplicationContext(),"Select country",Toast.LENGTH_LONG);
+    toast.setGravity(Gravity.CENTER, 0, 0);
+    toast.show();
+    return;
+}
+    register.setVisibility(View.INVISIBLE);
 
         JSONObject jsonObject =new JSONObject();
         try{
@@ -254,7 +307,7 @@ public class Login extends Activity implements View.OnClickListener {
             e.printStackTrace();
 
         }
-         String login_url="http://10.0.0.130/complaintlogger/login.php";
+         String login_url="http://220.227.57.26/complaint_logger/login.php";
         servicehandler=new Servicehandler(Login.this,jsonObject,login_interface);
 
           servicehandler.execute(login_url);
@@ -267,11 +320,27 @@ Login_interface login_interface=new Login_interface() {
     @Override
     public void oncompletion(JSONObject json) {
 
+if(json==null){
+    Toast toast=Toast.makeText(getApplicationContext(),"server offline",Toast.LENGTH_LONG);
+    toast.setGravity(Gravity.CENTER, 0, 0);
+
+    toast.show();
+
+register.setVisibility(View.VISIBLE);
+    return;
+
+}
+
         Log.d("final json from net", "111111111111" + json);
         try {
             id = json.getInt("id");
             Log.d("userid", "isssssssssss" + id);
-        } catch (JSONException e) {
+
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
