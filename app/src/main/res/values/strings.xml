@@ -6,5 +6,6 @@
     <string name="home_complaintHeadET">Complaint Head..</string>
     <string name="home_complaintET">Complaint..</string>
     <string name="login_spinner_title">Country</string>
+    <string name="sms_message"><![CDATA[ From : %1$s<br/>%2$s]]></string>
 
 </resources>

@@ -358,8 +358,11 @@ ProgressBar pg;
         protected Void doInBackground(String... strings) {
 
             Log.d("jobin", "selected country in the fetch organization class is " + strings[0]);
-            String result = servicehandler.makeServiceCall(url, strings[0]);
+
+                String result = servicehandler.makeServiceCall(url, strings[0]);
+
             Log.d("jobin", "result given from the makeservicecall is: " + result);
+
 
             try {
                 JSONArray jsonArray = null;
@@ -404,7 +407,6 @@ ProgressBar pg;
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
             if(organization_list.size()==0){
                 Toast toast= Toast.makeText(getApplicationContext(),"connection timeout...",Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER, 0, 0);

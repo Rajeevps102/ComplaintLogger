@@ -3,6 +3,8 @@ package complaintloggger.wiztelapp.com.complaint_logger;
 import android.app.Activity;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 
 import android.content.DialogInterface;
@@ -10,9 +12,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -33,13 +40,14 @@ import java.util.ArrayList;
  * Created by Raju on 04-05-2015.
  */
 public class Login extends Activity implements View.OnClickListener {
-
+//*******************************//
     /* id's for edittext and button
        edittext username
        edittext mail
        edittext mobile
        Button button
      */
+
     Button register;
     EditText uname;
     EditText mob;
@@ -54,6 +62,9 @@ public class Login extends Activity implements View.OnClickListener {
     String countryString;
 
 Boolean server_timeout=true;
+  String mobile_number_verification;
+    static String sender_number;
+    String number_format="+91";
 
     SharedPreferences splash;
     SharedPreferences.Editor editor;
@@ -61,6 +72,11 @@ Boolean server_timeout=true;
     Fetchspinner spn=new Fetchspinner();
     static String url="http://220.227.57.26/complaint_logger/addcomplaint.php";
     ArrayList<String> spinner_list=new ArrayList<String>(); //**** list to populate the spinner****//
+
+    SmsManager smsManager = SmsManager.getDefault();
+
+    // otp class
+
 
     // to check mobile number and email pattern//
 
@@ -196,22 +212,64 @@ spinner_list.remove(0);
         }
     }
 
+    // function to verify the user entered mobile number ...wil use the smsreceiver class
+    public void updateui(final String sender_number) {
+
+mobile_number_verification=sender_number;
+        getsendernumber(mobile_number_verification);
+
+    }
+
+    public static void getsendernumber(String number){
+
+        sender_number=number;
+    }
+
     @Override
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
+       // Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim);
+
+
+
 
 
 
         if(validate()&&checknumber()&&checkmail()){
           //  Toast.makeText(getApplicationContext(),"correct",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"verifying your mobile number",Toast.LENGTH_SHORT).show();
             Log.d("country","33333333333330"+countryString);
             splash = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
             editor = splash.edit();
             editor.putString("selectedcountryname",countryString);
 
             editor.commit();
+            smsManager.sendTextMessage(mobile_number, null, "Complaint Logger", null, null);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Log.d("numberrrrrr", "33333333333330" + sender_number);
+                        if (sender_number.toString().equals(number_format.concat(mobile_number))) {
+                            addingjsonvalues();
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(),"you have entered wrong mobile number",Toast.LENGTH_SHORT).show();
+                        }
+                    }catch (NullPointerException e){
+                        Toast.makeText(getApplicationContext(),"you have entered wrong mobile number",Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
 
-            addingjsonvalues();
+
+
+                }
+            },10000);
+
+
+
+
+
         }
            else{
             Toast.makeText(getApplicationContext(),"enter valid data",Toast.LENGTH_SHORT).show();
@@ -275,7 +333,7 @@ server_timeout=false;
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if(!server_timeout){
-                Toast.makeText(getApplicationContext(), "Server timeout", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Connection timeout.....", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -287,30 +345,32 @@ server_timeout=false;
     user_name=uname.getText().toString();
     mobile_number=mob.getText().toString();
     mail_id=email.getText().toString();
+
 if(countryString=="Select country"){
-   Toast toast= Toast.makeText(getApplicationContext(),"Select country",Toast.LENGTH_LONG);
+   Toast toast= Toast.makeText(getApplicationContext(),"server offline",Toast.LENGTH_LONG);
     toast.setGravity(Gravity.CENTER, 0, 0);
     toast.show();
     return;
 }
+        else {
     register.setVisibility(View.INVISIBLE);
 
-        JSONObject jsonObject =new JSONObject();
-        try{
-            jsonObject.put("status","login");
-            jsonObject.put("username",user_name);
-            jsonObject.put("mobile",mobile_number);
-            jsonObject.put("email",mail_id);
-            jsonObject.put("country",countryString);
-        }
-        catch(JSONException e){
-            e.printStackTrace();
+    JSONObject jsonObject = new JSONObject();
+    try {
+        jsonObject.put("status", "login");
+        jsonObject.put("username", user_name);
+        jsonObject.put("mobile", mobile_number);
+        jsonObject.put("email", mail_id);
+        jsonObject.put("country", countryString);
+    } catch (JSONException e) {
+        e.printStackTrace();
 
-        }
-         String login_url="http://220.227.57.26/complaint_logger/login.php";
-        servicehandler=new Servicehandler(Login.this,jsonObject,login_interface);
+    }
+    String login_url = "http://220.227.57.26/complaint_logger/login.php";
+    servicehandler = new Servicehandler(Login.this, jsonObject, login_interface);
 
-          servicehandler.execute(login_url);
+    servicehandler.execute(login_url);
+}
     }
 
 
@@ -354,5 +414,7 @@ register.setVisibility(View.VISIBLE);
         startActivity(home);
     }
 };
+
+
 
 }
