@@ -37,7 +37,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 	static InputStream is = null;
 	static String response = null;
     HttpURLConnection urlConnection;
-    private static final int CONN_TIMEOUT = 15 * 1000;
+    private static final int CONN_TIMEOUT = 10 * 1000;
 
 
     Context context;
@@ -66,9 +66,9 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             Log.d("inside make","handler"+url1);
             URL url = new URL(url1);
             urlConnection = (HttpURLConnection) url.openConnection();
-         //   urlConnection.setConnectTimeout(CONN_TIMEOUT);
-        //   urlConnection.setReadTimeout(CONN_TIMEOUT);
-         //   urlConnection.connect();
+            urlConnection.setConnectTimeout(CONN_TIMEOUT);
+           urlConnection.setReadTimeout(CONN_TIMEOUT);
+            urlConnection.connect();
 
                 InputStream in =urlConnection.getInputStream();
             Log.d("inside make","111111111111111111111111111111111111"+urlConnection.getInputStream());
@@ -86,16 +86,24 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
 
         }
+        catch (ConnectTimeoutException e){
+            response=null;
+            e.printStackTrace();
+        }
+
+
 
         catch (UnsupportedEncodingException e) {
+           // response=null;
             e.printStackTrace();
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
+           // response=null;
             e.printStackTrace();
         }
         catch (Exception e) {
-          //  response=null;
+          //response=null;
             Log.e("Buffer Error", "Error: " + e.toString());
         }
 
@@ -243,7 +251,7 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
 
     // for updating company name in home page spinner//
 
-    public String makeServiceCall(String url1, String country) {
+    public String makeServiceCall(String url1, String country)  {
         try {
 
             JSONObject jsonObject1=new JSONObject();
@@ -258,6 +266,8 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             urlConnection.setRequestProperty("Accept", "application/json");
 
             urlConnection.setRequestMethod("POST");
+            urlConnection.setConnectTimeout(CONN_TIMEOUT);
+            urlConnection.setReadTimeout(CONN_TIMEOUT);
 
             urlConnection.connect();
             OutputStreamWriter wr= new OutputStreamWriter(urlConnection.getOutputStream());
@@ -285,18 +295,27 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
             }
         }
 
+catch (ConnectTimeoutException e){
+    response=null;
+    e.printStackTrace();
+}
         catch(JSONException e){
+          //  response=null;
             e.printStackTrace();
 
         }
         catch (UnsupportedEncodingException e) {
+           // response=null;
             e.printStackTrace();
         } catch (ClientProtocolException e) {
+           // response=null;
             e.printStackTrace();
         } catch (IOException e) {
+           // response=null;
             e.printStackTrace();
         }
         catch (Exception e) {
+           // response=null;
             Log.e("Buffer Error", "Error: " + e.toString());
         }
         finally {
@@ -437,3 +456,8 @@ public class Servicehandler extends  AsyncTask<String,Integer,JSONObject>  {
         return response;
     }
 }
+
+
+
+
+
