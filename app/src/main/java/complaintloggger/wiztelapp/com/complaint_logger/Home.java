@@ -107,9 +107,16 @@ ProgressBar pg;
            a. clicking a photo or
            b. attaching photo from the external storage
       5. submit button*/
+
+
+
+
     public Home() {
 
     }
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
