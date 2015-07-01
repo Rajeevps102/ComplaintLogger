@@ -61,6 +61,7 @@
         android:text=""
         android:id="@+id/status_detail_complaint_tv"
         android:layout_gravity="center_vertical" />
+
 </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -84,6 +85,14 @@
         android:text=""
         android:id="@+id/status_detail_current_status_tv"
         android:layout_gravity="center_vertical" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:id="@+id/status_detail_status_time_tv"
+            android:layout_gravity="center_vertical" />
     </LinearLayout>
 
 
