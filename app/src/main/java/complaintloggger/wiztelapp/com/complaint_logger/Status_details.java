@@ -60,8 +60,6 @@ intent=getIntent();
 
     private void initToolbars() {
 
-
-
         Toolbar toolbarBottom = (Toolbar) findViewById(R.id.toolbar);
 
         toolbarBottom.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
