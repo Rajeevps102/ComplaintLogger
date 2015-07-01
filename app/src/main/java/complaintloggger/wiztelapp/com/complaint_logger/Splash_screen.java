@@ -43,6 +43,10 @@ public class Splash_screen extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         boolean connected = false;
+        //for initializing the chk value to true for first run
+        sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
+        editor = sp.edit();
+        chk = sp.getBoolean("firstlogin", true);
 
 
 //the following code checks for internet connectivity of the device and redirects to the home page if network is available and login form is filled
@@ -58,10 +62,6 @@ public class Splash_screen extends Activity {
             if (result != null && result.isConnectedOrConnecting()) {
              //   Toast.makeText(getApplicationContext(), "Mobile network  available", Toast.LENGTH_LONG).show();
 
-                //for initializing the chk value to true for first run
-                sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
-                editor = sp.edit();
-                chk = sp.getBoolean("firstlogin", true);
 
 
                 //Thread for creating the delay for splash screen
@@ -101,9 +101,9 @@ public class Splash_screen extends Activity {
 
 
                     //for initializing the chk value to true for first run
-                    sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
+                /*    sp = getSharedPreferences("isonetime", Context.MODE_PRIVATE);
                     editor = sp.edit();
-                    chk = sp.getBoolean("firstlogin", true);
+                    chk = sp.getBoolean("firstlogin", true); */
 
 
                     //Thread for creating the delay for splash screen

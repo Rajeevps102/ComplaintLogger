@@ -412,6 +412,7 @@ register.setVisibility(View.VISIBLE);
         editor.commit();
         Intent home=new Intent(Login.this,Home.class);
         startActivity(home);
+        finish();
     }
 };
 
