@@ -197,7 +197,7 @@ progressDialog.dismiss();
                 jobj=result.getJSONObject(i);
                 jsonObjectArrayList.add(jobj.toString());
                 complaint_head.add(jobj.getString("header"));
-                complaint_id.add(jobj.getInt("complaint_id"));
+                complaint_id.add(jobj.getInt("complaintId"));
                 complaint_status.add(jobj.getString("description"));
                 id.add(jobj.getInt("id"));
             }
